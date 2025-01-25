@@ -2,5 +2,10 @@ from dataclasses import dataclass
 
 
 @dataclass
+class Airfoil:
+    name: str
+
+
+@dataclass
 class Wing:
-    pass
+    airfoil: Airfoil
