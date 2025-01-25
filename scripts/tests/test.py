@@ -1,3 +1,7 @@
+"""
+This script tests the aerodynamics module
+"""
+
 from mdo_algorithm.disciplines.aerodynamics import (
     Airfoil,
     Wing,
