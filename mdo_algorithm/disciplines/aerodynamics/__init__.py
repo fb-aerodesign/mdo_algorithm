@@ -1,4 +1,6 @@
-from .models import (
-    Airfoil,
-    Wing,
-)
+"""
+Aerodynamics module
+"""
+
+from . import models
+from . import services
