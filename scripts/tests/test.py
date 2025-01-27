@@ -13,10 +13,7 @@ xfoil_service = XfoilService(
     iterations=1000,
     debug=True,
 )
-results = []
-results.append(xfoil_service.get_coefficients(Airfoil("fx74modsm")))
-results.append(xfoil_service.get_coefficients(Airfoil("s1223")))
-
-coefficients_array: list[DataFrame[Coefficients]] = [v for v in results if v is not None]
-
+coefficients_array: list[DataFrame[Coefficients]] = []
+coefficients_array.append(xfoil_service.get_coefficients(Airfoil("fx74modsm")))
+coefficients_array.append(xfoil_service.get_coefficients(Airfoil("s1223")))
 xfoil_service.plot_coefficients(coefficients_array)
