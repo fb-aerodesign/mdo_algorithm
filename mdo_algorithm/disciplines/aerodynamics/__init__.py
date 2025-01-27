@@ -2,5 +2,7 @@
 Aerodynamics module
 """
 
-from . import models
-from . import services
+from . import (
+    models,
+    services,
+)
