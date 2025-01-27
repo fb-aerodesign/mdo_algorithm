@@ -65,7 +65,7 @@ class XfoilService:
         self.__debug = debug
         self.__first_analysis = True
 
-    def get_coefficients(self, airfoil: Airfoil) -> DataFrame[Coefficients] | None:
+    def get_coefficients(self, airfoil: Airfoil) -> DataFrame[Coefficients]:
         """
         Get aerodynamic coefficients for a given airfoil and angle of attack.
 
