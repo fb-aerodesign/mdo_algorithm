@@ -2,3 +2,4 @@ numpy==2.2.2
 pandas==2.2.3
 pandera[mypy]==0.22.1
 matplotlib==3.10.0
+pywinpty==2.0.14
