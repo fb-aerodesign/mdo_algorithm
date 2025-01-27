@@ -3,7 +3,7 @@ This module provides services to interact with XFOIL for aerodynamic analysis.
 """
 
 import os
-import subprocess
+import winpty
 
 import pandas as pd
 import pandera as pa
@@ -35,64 +35,65 @@ class XfoilService:
     Service class to interact with XFOIL for aerodynamic analysis.
     """
 
-    def __init__(self):
-        """
-        Initialize the XfoilService with a subprocess to run XFOIL.
-        """
-        self.__xfoil_process = subprocess.Popen(
-            [os.path.join(XFOIL_PATH, "xfoil.exe")],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1,
-        )
-
-    def get_coefficients(
+    def __init__(
         self,
-        airfoil: Airfoil,
         alpha: list[float] | tuple[float, float, float],
-        reynolds: float,
-        iterations: int = 200,
-    ) -> DataFrame[Coefficients]:
+        reynolds: float | None = None,
+        iterations: int | None = None,
+        debug: bool = False,
+    ):
         """
-        Get aerodynamic coefficients for a given airfoil and angle of attack.
-
-        :param airfoil: The airfoil to analyze.
-        :type airfoil: Airfoil
+        Initialize the XfoilService.
 
         :param alpha: Angles of attack. Can be a list of angles or a tuple specifying the range
         (start, end, increment).
         :type alpha: list[float] | tuple[float, float, float]
 
         :param reynolds: Reynolds number.
-        :type reynolds: float
+        :type reynolds: float | None
 
         :param iterations: Number of iterations for XFOIL.
-        :type iterations: int
+        :type iterations: int | None
+
+        :param debug: Toggle debug mode to print xfoil outputs
+        :type debug: bool
+        """
+        self.__alpha = alpha
+        self.__reynolds = reynolds
+        self.__iterations = iterations
+        self.__xfoil = winpty.PtyProcess.spawn(os.path.join(XFOIL_PATH, "xfoil.exe"))
+        self.__debug = debug
+        self.__first_analysis = True
+
+    def get_coefficients(self, airfoil: Airfoil) -> DataFrame[Coefficients] | None:
+        """
+        Get aerodynamic coefficients for a given airfoil and angle of attack.
+
+        :param airfoil: The airfoil to analyze.
+        :type airfoil: Airfoil
 
         :return: DataFrame containing the aerodynamic coefficients.
         :rtype: DataFrame[Coefficients]
         """
         airfoil_path = os.path.join(AIRFOILS_PATH, f"{airfoil.name}.dat")
-        result_file_path = os.path.join(XFOIL_PATH, "results.txt")
-        commands = [
-            f"LOAD {airfoil_path}",
-            "PANE",
-            "OPER",
-            f"VISC {reynolds}",
-            f"ITER {iterations}",
-            "PACC",
-            result_file_path,
-            "",
-        ]
-        if isinstance(alpha, list):
-            commands.extend([f"ALFA {v}" for v in alpha])
+        result_file_path = os.path.join(XFOIL_PATH, "result.txt")
+        self.__send_command(f"LOAD {airfoil_path}")
+        self.__send_command("PANE")
+        self.__send_command("OPER")
+        if self.__reynolds is not None and self.__first_analysis:
+            self.__send_command(f"VISC {self.__reynolds}")
+            if self.__iterations is not None:
+                self.__send_command(f"ITER {self.__iterations}")
+        self.__send_command("PACC")
+        self.__send_command(result_file_path)
+        self.__send_command("")
+        if isinstance(self.__alpha, list):
+            for v in self.__alpha:
+                self.__send_command(f"ALFA {v}")
         else:
-            commands.append(f"ASEQ {alpha[0]} {alpha[1]} {alpha[2]}")
-        commands.append("")
-        commands.append("QUIT")
-        self.__xfoil_process.communicate("\n".join(commands))
+            self.__send_command(f"ASEQ {self.__alpha[0]} {self.__alpha[1]} {self.__alpha[2]}")
+        self.__send_command("PACC")
+        self.__send_command("")
         result_file_path = os.path.join(os.getcwd(), result_file_path)
         df = DataFrame[Coefficients](
             pd.read_fwf(
@@ -110,11 +111,11 @@ class XfoilService:
             )
         )
         df.attrs["airfoil"] = airfoil.name
-        df.attrs["reynolds"] = reynolds
         os.remove(result_file_path)
+        self.__first_analysis = False
         return df
 
-    def plot_coefficients(self, coefficients: DataFrame[Coefficients]) -> None:
+    def plot_coefficients(self, coefficients_array: list[DataFrame[Coefficients]]) -> None:
         """
         Plot the aerodynamic coefficients.
 
@@ -122,16 +123,38 @@ class XfoilService:
         :type coefficients: DataFrame[Coefficients]
         """
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-        fig.suptitle(
-            f"{coefficients.attrs['airfoil']} Coefficients | "
-            f"Reynolds: {coefficients.attrs['reynolds']}"
-        )
-        ax1.plot(coefficients["alpha"], coefficients["Cl"])
+        title = ["Coefficients"]
+        if self.__reynolds is None:
+            title.append("Inviscid")
+        else:
+            title.append(f"Reynolds: {self.__reynolds}")
+        fig.suptitle(" | ".join(title))
+        for coefficients in coefficients_array:
+            ax1.plot(coefficients["alpha"], coefficients["Cl"], label=coefficients.attrs["airfoil"])
+            ax2.plot(coefficients["alpha"], coefficients["Cd"], label=coefficients.attrs["airfoil"])
+            ax3.plot(coefficients["alpha"], coefficients["Cm"], label=coefficients.attrs["airfoil"])
+            ax4.plot(
+                coefficients["alpha"],
+                coefficients["Cl"] / coefficients["Cd"],
+                label=coefficients.attrs["airfoil"],
+            )
         ax1.set_title("Cl x alpha")
-        ax2.plot(coefficients["alpha"], coefficients["Cd"])
+        ax1.legend()
         ax2.set_title("Cd x alpha")
-        ax3.plot(coefficients["alpha"], coefficients["Cm"])
+        ax2.legend()
         ax3.set_title("Cm x alpha")
-        ax4.plot(coefficients["alpha"], coefficients["Cl"] / coefficients["Cd"])
+        ax3.legend()
         ax4.set_title("Cl/Cd x alpha")
+        ax4.legend()
         plt.show()
+
+    def __send_command(self, command: str) -> str:
+        self.__xfoil.write(command + "\r\n")
+        if self.__debug:
+            print(command)
+        output = ""
+        while "c>" not in output and "s>" not in output:
+            output += self.__xfoil.read()
+        if self.__debug:
+            print(output)
+        return output
