@@ -8,7 +8,7 @@ from mdo_algorithm.disciplines.aerodynamics.models import Airfoil
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService, Coefficients
 
 xfoil_service = XfoilService(
-    alpha=(0, 20, 1),
+    alpha=(0, 20, 0.5),
     reynolds=5e5,
     iterations=1000,
     debug=True,
