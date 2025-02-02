@@ -1,59 +1,108 @@
-# Cálculo do Número de Reynolds
+# Módulo `functions`
 
-## Introdução
+Este documento descreve o funcionamento do módulo `functions`, que contém funções auxiliares para cálculos aerodinâmicos.
 
-O número de Reynolds (Re) é um parâmetro adimensional que indica o regime de escoamento de um fluido sobre um corpo. No contexto da aerodinâmica, é um fator crucial para determinar a separação de camada limite e o comportamento do fluxo sobre um aerofólio.
+## 1. Introdução
 
-A equação geral para o número de Reynolds é:
+O módulo `functions` fornece funções fundamentais para a análise aerodinâmica, incluindo o cálculo da densidade do ar, viscosidade dinâmica e número de Reynolds.
 
-$$
-Re = \frac{\rho v L}{\mu}
-$$
+## 2. Estrutura do Módulo
 
-Onde:
+O módulo contém três funções principais:
 
-- \(\rho\) = densidade do ar (kg/m³),
-- \(v\) = velocidade do ar sobre o aerofólio (m/s),
-- \(L\) = comprimento característico (corda do aerofólio, em metros),
-- \(\mu\) = viscosidade dinâmica do ar (Pa.s ou kg/(m·s)).
+- `air_density(altitude: float) -> float`
+- `air_viscosity(temperature: float) -> float`
+- `reynolds_number(velocity: float, reference_length: float, altitude: float, temperature: float) -> float`
 
-## Cálculo da Densidade do Ar
+### 2.1 Cálculo da Densidade do Ar
 
-A densidade do ar varia conforme a altitude e pode ser estimada pela equação da Atmosfera Padrão Internacional (ISA):
+A densidade do ar é calculada com base na Atmosfera Padrão Internacional (ISA):
 
 $$
 \rho = \frac{P}{R T}
 $$
 
 Onde:
+- \( P \) = pressão atmosférica (Pa)
+- \( R \) = constante do gás para o ar seco (J/(kg·K))
+- \( T \) = temperatura do ar (K)
 
-- \(P\) = pressão atmosférica (Pa),
-- \(R\) = constante do gás para o ar seco (287.05 J/(kg·K)),
-- \(T\) = temperatura do ar (K).
-
-A pressão atmosférica é calculada por:
+A pressão atmosférica é obtida por:
 
 $$
 P = P_0 \left(1 - \frac{L h}{T_0}\right)^{\frac{g}{RL}}
 $$
 
-Onde:
+A implementação em Python é a seguinte:
 
-- \(P_0 = 101325\) Pa (pressão ao nível do mar),
-- \(L = 0.0065\) K/m (gradiente térmico),
-- \(h\) = altitude (m),
-- \(T_0 = 288.15\) K (temperatura ao nível do mar),
-- \(g = 9.80665\) m/s² (aceleração gravitacional).
+```python
+def air_density(altitude: float) -> float:
+    h = altitude
+    t0 = SEA_LEVEL_TEMPERATURE
+    p0 = SEA_LEVEL_PRESSURE
+    r0 = MOLAR_GAS_CONSTANT
+    m0 = MOLAR_MASS_FOR_DRY_AIR
+    l = TEMPERATURE_LAPSE_RATE
+    g = GRAVITATIONAL_ACCELERATION
 
-## Cálculo da Viscosidade do Ar
+    r = r0 / m0
+    t = t0 - l * h
+    p = p0 * (1 - l * h / t0) ** (g / (r * l))
+    rho = p / (r * t)
+    return rho
+```
 
-A viscosidade dinâmica do ar é calculada pela fórmula de Sutherland:
+### 2.2 Cálculo da Viscosidade do Ar
+
+A viscosidade dinâmica do ar é calculada pela equação de Sutherland:
 
 $$
 \mu = \frac{C_1 T^{3/2}}{T + S}
 $$
 
 Onde:
+- \( C_1 \) = constante de Sutherland
+- \( S \) = constante de temperatura
 
-- \(C_1 = 1.458 \times 10^{-6}\) kg/(m·s·K^0.5) (constante de Sutherland),
-- \(S = 110.4\) K (constante de temperatura).
+A implementação é:
+
+```python
+def air_viscosity(temperature: float) -> float:
+    t = temperature + 273.15
+    c1 = SUTHERLAND_CONSTANT
+    s = SUTHERLAND_TEMPERATURE_CONSTANT
+
+    mu = c1 * t**1.5 / (t + s)
+    return mu
+```
+
+### 2.3 Cálculo do Número de Reynolds
+
+O número de Reynolds é definido como:
+
+$$
+Re = \frac{\rho v L}{\mu}
+$$
+
+Onde:
+- \( \rho \) = densidade do ar (kg/m³)
+- \( v \) = velocidade do ar sobre o aerofólio (m/s)
+- \( L \) = comprimento característico (corda do aerofólio, em metros)
+- \( \mu \) = viscosidade dinâmica do ar (Pa.s)
+
+A implementação em Python:
+
+```python
+def reynolds_number(
+    velocity: float, reference_length: float, altitude: float, temperature: float
+) -> float:
+    rho = air_density(altitude)
+    mu = air_viscosity(temperature)
+
+    re = (rho * velocity * reference_length) / mu
+    return re
+```
+
+## 3. Conclusão
+
+O módulo `functions` fornece funções essenciais para cálculos aerodinâmicos, facilitando a análise de escoamentos e condições atmosféricas para aplicações aeronáuticas.
