@@ -1,5 +1,9 @@
 """
 Aerodynamics models
+
+This module defines classes for representing airfoils, wing sections, and complete wings.
+It includes geometric calculations essential for aircraft design, such as span, 
+planform area, and mean geometric chord.
 """
 
 import os
@@ -15,7 +19,10 @@ from mdo_algorithm.disciplines.aerodynamics.constants import AIRFOILS_PATH
 @dataclass
 class Airfoil:
     """
-    Airfoil dataclass
+    Represents an airfoil by its name.
+
+    :param name: Name of the airfoil, used to load aerodynamic profile files.
+    :type name: str
     """
 
     name: str
@@ -24,7 +31,25 @@ class Airfoil:
 @dataclass
 class WingSection:
     """
-    WingSection dataclass
+    Represents a section of the wing.
+
+    :param x: Position of the section along the x-axis.
+    :type x: float
+
+    :param y: Position of the section along the y-axis.
+    :type y: float
+
+    :param z: Position of the section along the z-axis.
+    :type z: float
+
+    :param chord: Local aerodynamic chord length.
+    :type chord: float
+
+    :param twist: Twist angle of the section.
+    :type twist: float
+
+    :param airfoil: Instance of the airfoil associated with the section.
+    :type airfoil: Airfoil
     """
 
     x: float
@@ -38,20 +63,27 @@ class WingSection:
 @dataclass
 class Wing:
     """
-    Wing dataclass
+    Represents a wing composed of multiple sections.
+    Contains methods to calculate geometric parameters.
     """
 
     sections: list[WingSection] = field(default_factory=list)
 
     def span(self) -> float:
         """
-        Calculate the span of the wing
+        Compute the total wingspan.
+
+        :return: Wingspan in meters.
+        :rtype: float
         """
         return 2 * max(s.y for s in self.sections)
 
     def planform_area(self) -> float:
         """
-        Calculate the planform area of the wing
+        Compute the wing planform area using the average chord of the sections.
+
+        :return: Planform area in square meters.
+        :rtype: float
         """
         sections = sorted(self.sections, key=lambda x: x.y)
         sections = [(sections[i], sections[i + 1]) for i in range(len(sections) - 1)]
@@ -65,6 +97,12 @@ class Wing:
     def chord_distribution(self, y: float) -> float:
         """
         Interpolate chord length at given y position.
+
+        :param y: Spanwise position.
+        :type y: float
+
+        :return: Interpolated chord length.
+        :rtype: float
         """
         sections = sorted(self.sections, key=lambda x: x.y)
         ys = np.array([s.y for s in sections])
@@ -74,6 +112,12 @@ class Wing:
     def chord_slope(self, y: float) -> float:
         """
         Estimate the local slope dx/dy at a given y position using linear interpolation.
+
+        :param y: Spanwise position.
+        :type y: float
+
+        :return: Local chord slope.
+        :rtype: float
         """
         sections = sorted(self.sections, key=lambda x: x.y)
         ys = np.array([s.y for s in sections])
@@ -87,6 +131,9 @@ class Wing:
     def mean_geometric_chord(self) -> float:
         """
         Calculate the mean geometric chord using integration, accounting for x-offset.
+
+        :return: Mean geometric chord in meters.
+        :rtype: float
         """
         s = self.planform_area()
 
@@ -111,7 +158,10 @@ class Wing:
         profile_drag_coefficient: float = 0,
     ) -> str:
         """
-        Generate AVL input
+        Generate an AVL input.
+
+        :return: Formatted string in AVL format.
+        :rtype: str
         """
         if len(self.sections) < 2:
             raise RuntimeError("The wing must have at least 2 sections")
