@@ -112,6 +112,16 @@ def to_avl(self, plane_name="Plane", wing_name="Wing", mach=0, iysym=1, izsym=0,
                 str(round(self.span(), 3)),
             ]
         ),
+        " ".join(
+            [
+                str(round(self.mean_geometric_chord() / 4, 3)),
+                "0",
+                "0",
+            ]
+        ),
+        str(round(profile_drag_coefficient, 5)),
+        "SURFACE",
+        wing_name,
     ]
     for section in sections:
         airfoil_path = os.path.join(AIRFOILS_PATH, f"{section.airfoil.name}.dat")
