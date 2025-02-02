@@ -1,5 +1,5 @@
 """
-This script tests the aerodynamics module
+This script tests the XFOIL tools
 """
 
 from pandera.typing import DataFrame
