@@ -11,10 +11,11 @@ from pandera.typing import DataFrame, Index, Series
 
 import matplotlib.pyplot as plt
 
+from mdo_algorithm.disciplines.aerodynamics.constants import (
+    AIRFOILS_PATH,
+    XFOIL_PATH,
+)
 from mdo_algorithm.disciplines.aerodynamics.models import Airfoil
-
-XFOIL_PATH = os.path.join("mdo_algorithm", "softwares", "xfoil")
-AIRFOILS_PATH = os.path.join("mdo_algorithm", "disciplines", "aerodynamics", "airfoils")
 
 
 class Coefficients(pa.DataFrameModel):
