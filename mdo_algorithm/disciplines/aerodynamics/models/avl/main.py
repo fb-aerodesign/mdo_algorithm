@@ -1,5 +1,8 @@
 """
 Aerodynamics AVL models
+
+This module defines data structures for configuring aerodynamic models in AVL.
+It provides classes to represent key AVL input parameters.
 """
 
 from dataclasses import dataclass
