@@ -20,6 +20,7 @@ class Symmetry(IntEnum):
     - ANTISYMMETRIC: Indicates antisymmetry about the reference plane (-1 in AVL).
     - IGNORE: No symmetry is assumed (0 in AVL).
     """
+
     SYMMETRIC = 1
     ANTISYMMETRIC = -1
     IGNORE = 0
@@ -35,6 +36,7 @@ class Deflection(IntEnum):
     - NORMAL: Control moves in the standard direction (1 in AVL).
     - INVERSE: Control moves in the opposite direction (-1 in AVL).
     """
+
     NORMAL = 1
     INVERSE = -1
 
