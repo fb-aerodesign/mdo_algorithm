@@ -1,5 +1,5 @@
 """
-This script tests de AVL tools
+This script tests the AVL tools
 """
 
 from mdo_algorithm.disciplines.aerodynamics.models import (
