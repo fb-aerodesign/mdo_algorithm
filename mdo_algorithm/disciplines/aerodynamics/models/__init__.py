@@ -2,8 +2,7 @@
 Aerodynamics models module
 """
 
-from .main import (
-    Airfoil,
-    WingSection,
-    Wing,
+from . import (
+    avl,
+    geometries,
 )

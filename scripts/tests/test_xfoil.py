@@ -8,7 +8,7 @@ from mdo_algorithm.disciplines.common.functions import (
     reynolds_number,
 )
 
-from mdo_algorithm.disciplines.aerodynamics.models import Airfoil
+from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService, Coefficients
 
 analysis_parameters = {
