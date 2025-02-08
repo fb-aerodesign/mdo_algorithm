@@ -1,0 +1,3 @@
+"""
+Aerodynamics AVL models module
+"""
