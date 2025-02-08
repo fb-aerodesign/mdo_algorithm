@@ -1,5 +1,5 @@
 """
-Aerodynamics models
+Aerodynamics geometry models
 
 This module defines classes for representing airfoils, wing sections, and complete wings.
 It includes geometric calculations essential for aircraft design, such as span, 

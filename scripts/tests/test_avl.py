@@ -2,7 +2,7 @@
 This script tests the AVL tools
 """
 
-from mdo_algorithm.disciplines.aerodynamics.models import (
+from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     Airfoil,
     WingSection,
     Wing,

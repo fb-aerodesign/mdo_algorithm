@@ -8,7 +8,7 @@ from typing import Literal
 from mdo_algorithm.disciplines.aerodynamics.constants import (
     AIRFOILS_PATH,
 )
-from mdo_algorithm.disciplines.aerodynamics.models import Wing
+from mdo_algorithm.disciplines.aerodynamics.models.geometries import Wing
 
 
 class AvlService:
