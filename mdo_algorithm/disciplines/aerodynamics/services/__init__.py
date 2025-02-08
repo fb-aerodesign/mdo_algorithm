@@ -2,4 +2,7 @@
 Aerodynamics services module
 """
 
-from . import xfoil
+from . import (
+    xfoil,
+    avl,
+)
