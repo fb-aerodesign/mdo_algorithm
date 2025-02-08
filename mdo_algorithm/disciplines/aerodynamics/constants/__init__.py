@@ -3,6 +3,7 @@ Aerodynamics constants module
 """
 
 from .main import (
-    AIRFOILS_PATH,
     XFOIL_PATH,
+    AVL_PATH,
+    AIRFOILS_PATH,
 )
