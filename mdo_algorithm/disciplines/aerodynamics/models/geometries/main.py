@@ -45,7 +45,7 @@ class WingSection:
     :param chord: Local aerodynamic chord length.
     :type chord: float
 
-    :param twist: Twist angle of the section.
+    :param incremental_angle: Twist angle of the section.
     :type twist: float
 
     :param airfoil: Instance of the airfoil associated with the section.
@@ -54,7 +54,7 @@ class WingSection:
 
     location: Xyz
     chord: float
-    twist: float
+    incremental_angle: float
     airfoil: Airfoil
 
 
