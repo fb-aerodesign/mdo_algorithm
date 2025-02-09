@@ -675,3 +675,15 @@ class Input:
     header: Header
     surface_array: list[Surface]
     body_array: list[Body]
+
+    def to_input_file(self) -> str:
+        """
+        Export formatted string for the AVL input file
+        """
+        return "\n".join(
+            [
+                self.header.to_input_file(),
+                "\n".join([surface.to_input_file() for surface in self.surface_array]),
+                "\n".join([body.to_input_file() for body in self.body_array]),
+            ]
+        )
