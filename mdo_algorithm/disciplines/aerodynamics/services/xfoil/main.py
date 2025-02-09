@@ -15,7 +15,7 @@ from mdo_algorithm.disciplines.aerodynamics.constants import (
     AIRFOILS_PATH,
     XFOIL_PATH,
 )
-from mdo_algorithm.disciplines.aerodynamics.models import Airfoil
+from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
 
 
 class Coefficients(pa.DataFrameModel):
