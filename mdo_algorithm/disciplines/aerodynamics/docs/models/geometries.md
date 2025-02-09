@@ -1,10 +1,10 @@
 # Modelos Geométricos Aerodinâmicos
 
-Este documento descreve o funcionamento do módulo `aerodynamics_geometry_models.py`, que contém classes para modelagem geométrica de aerofólios e asas.
+Este documento descreve o funcionamento do módulo `geometries`, que contém classes para modelagem geométrica de aerofólios e asas.
 
 ## 1. Introdução
 
-O módulo `aerodynamics_geometry_models.py` fornece classes para representar aerofólios, seções de asas e asas completas. Ele também inclui métodos para calcular parâmetros geométricos essenciais no projeto aeronáutico, como envergadura, área da planta e corda aerodinâmica média.
+O módulo `geometries` fornece classes para representar aerofólios, seções de asas e asas completas. Ele também inclui métodos para calcular parâmetros geométricos essenciais no projeto aeronáutico, como envergadura, área da planta e corda aerodinâmica média.
 
 ## 2. Representação de Aerofólios
 
@@ -87,5 +87,5 @@ def mean_aerodynamic_chord(self) -> float:
 
 ## 5. Conclusão
 
-O módulo `aerodynamics_geometry_models.py` fornece ferramentas essenciais para modelagem geométrica de asas e aerofólios. Ele permite cálculos precisos que auxiliam no projeto e análise aerodinâmica de aeronaves.
+O módulo `geometries` fornece ferramentas essenciais para modelagem geométrica de asas e aerofólios. Ele permite cálculos precisos que auxiliam no projeto e análise aerodinâmica de aeronaves.
 
