@@ -57,7 +57,7 @@ class Wing:
     Contains methods to calculate geometric parameters.
     """
 
-    sections: list[WingSection] = field(default_factory=list)
+    section_array: list[WingSection] = field(default_factory=list)
 
     def span(self) -> float:
         """
@@ -66,7 +66,7 @@ class Wing:
         :return: Wingspan in meters.
         :rtype: float
         """
-        return 2 * max(s.location.y for s in self.sections)
+        return 2 * max(s.location.y for s in self.section_array)
 
     def planform_area(self) -> float:
         """
@@ -75,7 +75,7 @@ class Wing:
         :return: Planform area in square meters.
         :rtype: float
         """
-        sections = sorted(self.sections, key=lambda x: x.location.y)
+        sections = sorted(self.section_array, key=lambda x: x.location.y)
         sections = [(sections[i], sections[i + 1]) for i in range(len(sections) - 1)]
         return 2 * np.sum(
             [
@@ -98,7 +98,7 @@ class Wing:
         :return: Interpolated chord length.
         :rtype: float
         """
-        sections = sorted(self.sections, key=lambda x: x.location.y)
+        sections = sorted(self.section_array, key=lambda x: x.location.y)
         ys = np.array([s.location.y for s in sections])
         chords = np.array([s.chord for s in sections])
         return np.interp(y, ys, chords)
@@ -113,7 +113,7 @@ class Wing:
         :return: Local chord slope.
         :rtype: float
         """
-        sections = sorted(self.sections, key=lambda x: x.location.y)
+        sections = sorted(self.section_array, key=lambda x: x.location.y)
         ys = np.array([s.location.y for s in sections])
         xs = np.array([s.location.x for s in sections])
         result = 0
@@ -134,8 +134,8 @@ class Wing:
         def integrand(y):
             return self.chord_distribution(y) ** 2 * np.sqrt(1 + self.chord_slope(y) ** 2)
 
-        y_min, y_max = min(s.location.y for s in self.sections), max(
-            s.location.y for s in self.sections
+        y_min, y_max = min(s.location.y for s in self.section_array), max(
+            s.location.y for s in self.section_array
         )
         result = 0
         if y_max != y_min:
