@@ -31,7 +31,7 @@ class Airfoil:
         """
         Airfoil's file relative path
         """
-        return os.path.join(AIRFOILS_PATH, self.name)
+        return os.path.join(AIRFOILS_PATH, self.name + ".dat")
 
 
 @dataclass
