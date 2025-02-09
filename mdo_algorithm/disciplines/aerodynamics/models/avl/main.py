@@ -234,7 +234,7 @@ class Control:
         max_item_size = 1 + max(len(item) for item, _ in data)
         return "\n".join(
             [
-                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
+                " | ".join(["\t\t" + item.ljust(max_item_size), comment]) if comment != "" else item
                 for item, comment in data
             ]
         )
