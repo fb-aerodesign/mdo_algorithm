@@ -214,9 +214,10 @@ class Control:
         Export formatted string for the AVL input file
         """
         data: list[tuple[str, str]] = [
-            ("CONTROL", "(keyword)"),
+            (8 * " " + "CONTROL", "(keyword)"),
             (
-                "  ".join(
+                8 * " "
+                + "  ".join(
                     [
                         self.name,
                         str(self.gain),
@@ -234,7 +235,7 @@ class Control:
         max_item_size = 1 + max(len(item) for item, _ in data)
         return "\n".join(
             [
-                " | ".join(["\t\t" + item.ljust(max_item_size), comment]) if comment != "" else item
+                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
                 for item, comment in data
             ]
         )
