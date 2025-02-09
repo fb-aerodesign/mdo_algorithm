@@ -6,12 +6,14 @@ It includes geometric calculations essential for aircraft design, such as span,
 planform area, and mean geometric chord.
 """
 
+import os
 from dataclasses import dataclass, field
 
 import numpy as np
 from scipy.integrate import quad
 
 from mdo_algorithm.disciplines.common.models.geometries import Xyz
+from mdo_algorithm.disciplines.aerodynamics.constants import AIRFOILS_PATH
 
 
 @dataclass
@@ -24,6 +26,12 @@ class Airfoil:
     """
 
     name: str
+
+    def path(self):
+        """
+        Airfoil's file path
+        """
+        return os.path.join(AIRFOILS_PATH, self.name)
 
 
 @dataclass
