@@ -62,8 +62,8 @@ class Header:
     :type z_symmetry: Symmetry
 
     :param xy_plane_location: Reference location for the XY plane (corresponds to Zsym in
-    AVL, required if z_symmetry/iZsym is not IGNORE/0).
-    :type xy_plane_location: float | None
+    AVL, ignored if z_symmetry/iZsym is IGNORE/0).
+    :type xy_plane_location: float
 
     :param reference_area: Reference wing area (corresponds to Sref in AVL).
     :type reference_area: float
@@ -87,7 +87,7 @@ class Header:
     default_mach_number: float
     y_symmetry: Symmetry
     z_symmetry: Symmetry
-    xy_plane_location: float | None
+    xy_plane_location: float
     reference_area: float
     reference_chord: float
     reference_span: float
