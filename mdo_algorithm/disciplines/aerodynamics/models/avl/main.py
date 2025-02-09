@@ -551,6 +551,111 @@ class Surface:
     profile_drag_settings: ProfileDragSettings | None
     section_array: list[Section]
 
+    def to_input_file(self) -> str:
+        """
+        Export formatted string for the AVL input file
+        """
+        data: list[tuple[str, str]] = [
+            ("SURFACE", "(keyword)"),
+            (self.name, "surface name string"),
+            (
+                "  ".join(
+                    [
+                        str(self.chordwise_vortice_count),
+                        str(self.chordwise_vortex_spacing),
+                        str(self.spanwise_vortice_count),
+                        str(self.spanwise_vortex_spacing),
+                    ]
+                ),
+                "Nchord Cspace [ Nspan Sspace ]",
+            ),
+        ]
+        if self.mirror_surface:
+            if self.xz_plane_location is None:
+                raise RuntimeError("XY plane location must be defined if mirror surface is True")
+            data.extend(
+                [
+                    (4 * " " + "YDUPLICATE", "(keyword)"),
+                    (4 * " " + str(self.xz_plane_location), "Ydupl"),
+                ]
+            )
+        if self.scale is not None:
+            data.extend(
+                [
+                    (4 * " " + "SCALE", "(keyword)"),
+                    (
+                        4 * " "
+                        + "  ".join(
+                            [
+                                str(self.scale.x),
+                                str(self.scale.y),
+                                str(self.scale.z),
+                            ]
+                        ),
+                        "Xscale Yscale Zscale",
+                    ),
+                ]
+            )
+        if self.translate is not None:
+            data.extend(
+                [
+                    (4 * " " + "TRANSLATE", "(keyword)"),
+                    (
+                        4 * " "
+                        + "  ".join(
+                            [
+                                str(self.translate.x),
+                                str(self.translate.y),
+                                str(self.translate.z),
+                            ]
+                        ),
+                        "dX     dY     dZ",
+                    ),
+                ]
+            )
+        if self.incremental_angle is not None:
+            data.extend(
+                [(4 * " " + "ANGLE", "(keyword)"), (4 * " " + str(self.incremental_angle), "dAinc")]
+            )
+        if self.ignore_wake:
+            data.append((4 * " " + "NOWAKE", "(keyword)"))
+        if self.ignore_freestream_effect:
+            data.append((4 * " " + "NOALBE", "(keyword)"))
+        if self.ignore_load_contribution:
+            data.append((4 * " " + "NOLOAD", "(keyword)"))
+        if self.profile_drag_settings is not None:
+            data.extend(
+                [
+                    (4 * " " + "CDCL", "(keyword)"),
+                    (
+                        4 * " "
+                        + "  ".join(
+                            [
+                                str(self.profile_drag_settings.cl1),
+                                str(self.profile_drag_settings.cd1),
+                                str(self.profile_drag_settings.cl2),
+                                str(self.profile_drag_settings.cd2),
+                                str(self.profile_drag_settings.cl3),
+                                str(self.profile_drag_settings.cd3),
+                            ]
+                        ),
+                        "CD (CL) function parameters",
+                    ),
+                ]
+            )
+        data.append(("", ""))
+        max_item_size = 1 + max(len(item) for item, _ in data)
+        return (
+            "\n".join(
+                [
+                    " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
+                    for item, comment in data
+                ]
+            )
+            + "\n"
+            + "\n".join([section.to_input_file() for section in self.section_array])
+        )
+
 
 @dataclass
 class Input:
