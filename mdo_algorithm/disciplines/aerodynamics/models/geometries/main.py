@@ -78,22 +78,16 @@ class Wing:
 
     def planform_area(self) -> float:
         """
-        Compute the wing planform area using the average chord of the sections.
+        Compute the wing planform area.
 
         :return: Planform area in square meters.
         :rtype: float
         """
         sections = sorted(self.section_array, key=lambda x: x.location.y)
-        sections = [(sections[i], sections[i + 1]) for i in range(len(sections) - 1)]
-        return 2 * np.sum(
-            [
-                0.5
-                * (s1.chord + s2.chord)
-                * np.sqrt(
-                    (s2.location.y - s1.location.y) ** 2 + (s2.location.x - s1.location.x) ** 2
-                )
-                for s1, s2 in sections
-            ]
+        return 2 * float(
+            np.trapezoid(
+                np.array([s.chord for s in sections]), np.array([s.location.y for s in sections])
+            )
         )
 
     def chord_distribution(self, y: float) -> float:
@@ -111,42 +105,17 @@ class Wing:
         chords = np.array([s.chord for s in sections])
         return np.interp(y, ys, chords)
 
-    def chord_slope(self, y: float) -> float:
+    def mean_aerodynamic_chord(self) -> float:
         """
-        Estimate the local slope dx/dy at a given y position using linear interpolation.
-
-        :param y: Spanwise position.
-        :type y: float
-
-        :return: Local chord slope.
-        :rtype: float
-        """
-        sections = sorted(self.section_array, key=lambda x: x.location.y)
-        ys = np.array([s.location.y for s in sections])
-        xs = np.array([s.location.x for s in sections])
-        result = 0
-        if len(ys) > 1:
-            slopes = np.gradient(xs, ys)
-            result = np.interp(y, ys, slopes)
-        return result
-
-    def mean_geometric_chord(self) -> float:
-        """
-        Calculate the mean geometric chord using integration, accounting for x-offset.
+        Calculate the mean aerodynamic chord using integration.
 
         :return: Mean geometric chord in meters.
         :rtype: float
         """
-        s = self.planform_area()
-
-        def integrand(y):
-            return self.chord_distribution(y) ** 2 * np.sqrt(1 + self.chord_slope(y) ** 2)
-
-        y_min, y_max = min(s.location.y for s in self.section_array), max(
-            s.location.y for s in self.section_array
-        )
+        area = self.planform_area()
         result = 0
-        if y_max != y_min:
-            cmg_numerator, _ = quad(integrand, y_min, y_max)
-            result = (2 / s) * cmg_numerator if s > 0 else 0
+        if area != 0:
+            result = (
+                2 / area * quad(lambda x: self.chord_distribution(x) ** 2, 0, self.span() / 2)[0]
+            )
         return result
