@@ -3,7 +3,7 @@ Aerodynamics geometry models
 
 This module defines classes for representing airfoils, wing sections, and complete wings.
 It includes geometric calculations essential for aircraft design, such as span, 
-planform area, and mean geometric chord.
+planform area, and mean aerodynamic chord.
 """
 
 import os
