@@ -245,9 +245,9 @@ class Section:
     """
     Sectional element of a surface in AVL.
 
-    :param leading_edge_location: Position of the leading edge (corresponds to Xle, Yle
+    :param location: Position of the leading edge (corresponds to Xle, Yle
     and Zle in AVL).
-    :type leading_edge_location: Xyz
+    :type location: Xyz
 
     :param chord: Section chord length (corresponds to Chord in AVL).
     :type chord: float
@@ -278,7 +278,7 @@ class Section:
     :type profile_drag_settings: ProfileDragSettings | None
     """
 
-    leading_edge_location: Xyz
+    location: Xyz
     chord: float
     incremental_angle: float
     spanwise_vortice_count: int | None
