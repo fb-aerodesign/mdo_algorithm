@@ -92,7 +92,57 @@ class Header:
     reference_chord: float
     reference_span: float
     default_location: Xyz
-    default_profile_drag_coefficient: float
+    default_profile_drag_coefficient: float | None
+
+    def to_input_file(self) -> str:
+        """
+        Export formatted string for the AVL input file
+        """
+        max_first_value = 2 + max(
+            len(v)
+            for v in [
+                str(self.default_mach_number),
+                str(self.reference_area),
+                str(self.default_location.x),
+                str(self.default_profile_drag_coefficient),
+            ]
+        )
+        max_second_value = 2 + max(
+            len(v) for v in [str(self.reference_chord), str(self.default_location.y)]
+        )
+        data: list[tuple[str, str]] = [
+            (self.title, "case title"),
+            ("", ""),
+            (str(self.default_mach_number).ljust(max_first_value), "Mach"),
+            (
+                str(self.y_symmetry.value).ljust(max_first_value)
+                + str(self.z_symmetry.value).ljust(max_second_value)
+                + str(self.xy_plane_location),
+                "iYsym  iZsym  Zsym",
+            ),
+            (
+                str(self.reference_area).ljust(max_first_value)
+                + str(self.reference_chord).ljust(max_second_value)
+                + str(self.reference_span),
+                "Sref   Cref   Bref",
+            ),
+            (
+                str(self.default_location.x).ljust(max_first_value)
+                + str(self.default_location.y).ljust(max_second_value)
+                + str(self.default_location.z),
+                "Xref   Yref   Zref",
+            ),
+        ]
+        if self.default_profile_drag_coefficient is not None:
+            data.append((str(self.default_profile_drag_coefficient), "CDp"))
+        data.append(("", ""))
+        max_item_size = 1 + max(len(item) for item, _ in data)
+        return "\n".join(
+            [
+                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
+                for item, comment in data
+            ]
+        )
 
 
 @dataclass
