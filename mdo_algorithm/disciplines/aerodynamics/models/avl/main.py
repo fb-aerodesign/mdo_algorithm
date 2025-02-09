@@ -289,6 +289,78 @@ class Section:
     cl_alpha_slope_scaling: float | None
     profile_drag_settings: ProfileDragSettings | None
 
+    def to_input_file(self) -> str:
+        """
+        Export formatted string for the AVL input file
+        """
+        data: list[tuple[str, str]] = [
+            (4 * " " + "SECTION", "(keyword)"),
+            (
+                4 * " "
+                + "  ".join(
+                    [
+                        str(self.location.x),
+                        str(self.location.y),
+                        str(self.location.z),
+                        str(self.chord),
+                        str(self.incremental_angle),
+                        (
+                            str(self.spanwise_vortice_count)
+                            if self.spanwise_vortice_count is not None
+                            else ""
+                        ),
+                        (
+                            str(self.spanwise_vortex_spacing)
+                            if self.spanwise_vortex_spacing is not None
+                            else ""
+                        ),
+                    ]
+                ),
+                "Xle Yle Zle Chord Ainc [ Nspan Sspace ]",
+            ),
+            (8 * " " + "AFILE", "(keyword)"),
+            (8 * " " + self.airfoil.relative_path(), "filename string"),
+        ]
+        if self.cl_alpha_slope_scaling is not None:
+            data.extend(
+                [
+                    (8 * " " + "CLAF", "(keyword)"),
+                    (8 * " " + str(self.cl_alpha_slope_scaling), "dCL/da scaling factor"),
+                ]
+            )
+        if self.profile_drag_settings is not None:
+            data.extend(
+                [
+                    (8 * " " + "CDCL", "(keyword)"),
+                    (
+                        8 * " "
+                        + "  ".join(
+                            [
+                                str(self.profile_drag_settings.cl1),
+                                str(self.profile_drag_settings.cd1),
+                                str(self.profile_drag_settings.cl2),
+                                str(self.profile_drag_settings.cd2),
+                                str(self.profile_drag_settings.cl3),
+                                str(self.profile_drag_settings.cd3),
+                            ]
+                        ),
+                        "CD (CL) function parameters",
+                    ),
+                ]
+            )
+        data.append(("", ""))
+        max_item_size = 1 + max(len(item) for item, _ in data)
+        return (
+            "\n".join(
+                [
+                    " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
+                    for item, comment in data
+                ]
+            )
+            + "\n"
+            + "\n".join([control.to_input_file() for control in self.control_array])
+        )
+
 
 @dataclass
 class Body:
