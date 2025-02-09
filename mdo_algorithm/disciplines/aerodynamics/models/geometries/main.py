@@ -27,9 +27,9 @@ class Airfoil:
 
     name: str
 
-    def path(self):
+    def relative_path(self):
         """
-        Airfoil's file path
+        Airfoil's file relative path
         """
         return os.path.join(AIRFOILS_PATH, self.name)
 
