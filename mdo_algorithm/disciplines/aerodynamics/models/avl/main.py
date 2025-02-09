@@ -209,6 +209,36 @@ class Control:
     hinge_axis_location: Xyz
     deflection: Deflection
 
+    def to_input_file(self) -> str:
+        """
+        Export formatted string for the AVL input file
+        """
+        data: list[tuple[str, str]] = [
+            ("CONTROL", "(keyword)"),
+            (
+                "  ".join(
+                    [
+                        self.name,
+                        str(self.gain),
+                        str(self.hinge_x_location),
+                        str(self.hinge_axis_location.x),
+                        str(self.hinge_axis_location.y),
+                        str(self.hinge_axis_location.z),
+                        str(self.deflection.value),
+                    ]
+                ),
+                "name, gain, Xhinge, XYZhvec, SgnDup",
+            ),
+        ]
+        data.append(("", ""))
+        max_item_size = 1 + max(len(item) for item, _ in data)
+        return "\n".join(
+            [
+                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
+                for item, comment in data
+            ]
+        )
+
 
 @dataclass
 class Section:
