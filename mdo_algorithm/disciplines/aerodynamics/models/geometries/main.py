@@ -109,7 +109,7 @@ class Wing:
         """
         Calculate the mean aerodynamic chord using integration.
 
-        :return: Mean geometric chord in meters.
+        :return: Mean aerodynamic chord in meters.
         :rtype: float
         """
         area = self.planform_area()
