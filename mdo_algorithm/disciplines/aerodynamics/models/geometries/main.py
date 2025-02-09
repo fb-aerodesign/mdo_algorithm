@@ -11,6 +11,8 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy.integrate import quad
 
+from mdo_algorithm.disciplines.common.models.geometries import Xyz
+
 
 @dataclass
 class Airfoil:
@@ -29,14 +31,8 @@ class WingSection:
     """
     Represents a section of the wing.
 
-    :param x: Position of the section along the x-axis.
-    :type x: float
-
-    :param y: Position of the section along the y-axis.
-    :type y: float
-
-    :param z: Position of the section along the z-axis.
-    :type z: float
+    :param leading_edge_location: Location of the airfoil's leading edge
+    :type leading_edge_location: Xyz
 
     :param chord: Local aerodynamic chord length.
     :type chord: float
@@ -48,9 +44,7 @@ class WingSection:
     :type airfoil: Airfoil
     """
 
-    x: float
-    y: float
-    z: float
+    location: Xyz
     chord: float
     twist: float
     airfoil: Airfoil
@@ -72,7 +66,7 @@ class Wing:
         :return: Wingspan in meters.
         :rtype: float
         """
-        return 2 * max(s.y for s in self.sections)
+        return 2 * max(s.location.y for s in self.sections)
 
     def planform_area(self) -> float:
         """
@@ -81,11 +75,15 @@ class Wing:
         :return: Planform area in square meters.
         :rtype: float
         """
-        sections = sorted(self.sections, key=lambda x: x.y)
+        sections = sorted(self.sections, key=lambda x: x.location.y)
         sections = [(sections[i], sections[i + 1]) for i in range(len(sections) - 1)]
         return 2 * np.sum(
             [
-                0.5 * (s1.chord + s2.chord) * np.sqrt((s2.y - s1.y) ** 2 + (s2.x - s1.x) ** 2)
+                0.5
+                * (s1.chord + s2.chord)
+                * np.sqrt(
+                    (s2.location.y - s1.location.y) ** 2 + (s2.location.x - s1.location.x) ** 2
+                )
                 for s1, s2 in sections
             ]
         )
@@ -100,8 +98,8 @@ class Wing:
         :return: Interpolated chord length.
         :rtype: float
         """
-        sections = sorted(self.sections, key=lambda x: x.y)
-        ys = np.array([s.y for s in sections])
+        sections = sorted(self.sections, key=lambda x: x.location.y)
+        ys = np.array([s.location.y for s in sections])
         chords = np.array([s.chord for s in sections])
         return np.interp(y, ys, chords)
 
@@ -115,9 +113,9 @@ class Wing:
         :return: Local chord slope.
         :rtype: float
         """
-        sections = sorted(self.sections, key=lambda x: x.y)
-        ys = np.array([s.y for s in sections])
-        xs = np.array([s.x for s in sections])
+        sections = sorted(self.sections, key=lambda x: x.location.y)
+        ys = np.array([s.location.y for s in sections])
+        xs = np.array([s.location.x for s in sections])
         result = 0
         if len(ys) > 1:
             slopes = np.gradient(xs, ys)
@@ -136,7 +134,9 @@ class Wing:
         def integrand(y):
             return self.chord_distribution(y) ** 2 * np.sqrt(1 + self.chord_slope(y) ** 2)
 
-        y_min, y_max = min(s.y for s in self.sections), max(s.y for s in self.sections)
+        y_min, y_max = min(s.location.y for s in self.sections), max(
+            s.location.y for s in self.sections
+        )
         result = 0
         if y_max != y_min:
             cmg_numerator, _ = quad(integrand, y_min, y_max)
