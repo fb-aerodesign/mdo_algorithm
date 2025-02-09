@@ -401,6 +401,75 @@ class Body:
     scale: Xyz | None
     translate: Xyz | None
 
+    def to_input_file(self) -> str:
+        """
+        Export formatted string for the AVL input file
+        """
+        data: list[tuple[str, str]] = [
+            ("BODY", "(keyword)"),
+            (self.name, "body name string"),
+            (
+                "  ".join(
+                    [
+                        str(self.node_count),
+                        str(self.node_spacing),
+                    ]
+                ),
+                "Nbody Bspace",
+            ),
+        ]
+        if self.mirror_surface:
+            if self.xz_plane_location is None:
+                raise RuntimeError("XY plane location must be defined if mirror surface is True")
+            data.extend(
+                [
+                    (4 * " " + "YDUPLICATE", "(keyword)"),
+                    (4 * " " + str(self.xz_plane_location), "Ydupl"),
+                ]
+            )
+        if self.scale is not None:
+            data.extend(
+                [
+                    (4 * " " + "SCALE", "(keyword)"),
+                    (
+                        4 * " "
+                        + "  ".join(
+                            [
+                                str(self.scale.x),
+                                str(self.scale.y),
+                                str(self.scale.z),
+                            ]
+                        ),
+                        "Xscale Yscale Zscale",
+                    ),
+                ]
+            )
+        if self.translate is not None:
+            data.extend(
+                [
+                    (4 * " " + "TRANSLATE", "(keyword)"),
+                    (
+                        4 * " "
+                        + "  ".join(
+                            [
+                                str(self.translate.x),
+                                str(self.translate.y),
+                                str(self.translate.z),
+                            ]
+                        ),
+                        "dX     dY     dZ",
+                    ),
+                ]
+            )
+        data.append(("", ""))
+        max_item_size = 1 + max(len(item) for item, _ in data)
+        return "\n".join(
+            [
+                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
+                for item, comment in data
+            ]
+        )
+
 
 @dataclass
 class Surface:
