@@ -98,51 +98,44 @@ class Header:
         """
         Export formatted string for the AVL input file
         """
-        max_first_value = 2 + max(
-            len(v)
-            for v in [
-                str(self.default_mach_number),
-                str(self.reference_area),
-                str(self.default_location.x),
-                str(self.default_profile_drag_coefficient),
-            ]
-        )
-        max_second_value = 2 + max(
-            len(v) for v in [str(self.reference_chord), str(self.default_location.y)]
-        )
-        data: list[tuple[str, str]] = [
-            (self.title, "case title"),
-            ("", ""),
-            (str(self.default_mach_number).ljust(max_first_value), "Mach"),
-            (
-                str(self.y_symmetry.value).ljust(max_first_value)
-                + str(self.z_symmetry.value).ljust(max_second_value)
-                + str(self.xy_plane_location),
-                "iYsym  iZsym  Zsym",
+        line_array: list[str] = [
+            "# case title",
+            self.title,
+            "",
+            "# Mach",
+            str(float(self.default_mach_number)),
+            "",
+            "# iYsym iZsym Zsym",
+            " ".join(
+                [
+                    str(self.y_symmetry.value),
+                    str(self.z_symmetry.value),
+                    str(float(self.xy_plane_location)),
+                ]
             ),
-            (
-                str(self.reference_area).ljust(max_first_value)
-                + str(self.reference_chord).ljust(max_second_value)
-                + str(self.reference_span),
-                "Sref   Cref   Bref",
+            "",
+            "# Sref Cref Bref",
+            " ".join(
+                [
+                    str(float(self.reference_area)),
+                    str(float(self.reference_chord)),
+                    str(float(self.reference_span)),
+                ]
             ),
-            (
-                str(self.default_location.x).ljust(max_first_value)
-                + str(self.default_location.y).ljust(max_second_value)
-                + str(self.default_location.z),
-                "Xref   Yref   Zref",
+            "",
+            "# Xref Yref Zref",
+            " ".join(
+                [
+                    str(float(self.default_location.x)),
+                    str(float(self.default_location.y)),
+                    str(float(self.default_location.z)),
+                ]
             ),
         ]
         if self.default_profile_drag_coefficient is not None:
-            data.append((str(self.default_profile_drag_coefficient), "CDp"))
-        data.append(("", ""))
-        max_item_size = 1 + max(len(item) for item, _ in data)
-        return "\n".join(
-            [
-                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
-                for item, comment in data
-            ]
-        )
+            line_array.extend(["", "# CDp", str(float(self.default_profile_drag_coefficient))])
+        line_array.append("")
+        return "\n".join(line_array)
 
 
 @dataclass
@@ -213,32 +206,25 @@ class Control:
         """
         Export formatted string for the AVL input file
         """
-        data: list[tuple[str, str]] = [
-            (8 * " " + "CONTROL", "(keyword)"),
-            (
-                8 * " "
-                + "  ".join(
-                    [
-                        self.name,
-                        str(self.gain),
-                        str(self.hinge_x_location),
-                        str(self.hinge_axis_location.x),
-                        str(self.hinge_axis_location.y),
-                        str(self.hinge_axis_location.z),
-                        str(self.deflection.value),
-                    ]
-                ),
-                "name, gain, Xhinge, XYZhvec, SgnDup",
+        line_array: list[str] = [
+            8 * " " + "CONTROL",
+            "",
+            "#" + 7 * " " + "name, gain, Xhinge, XYZhvec, SgnDup",
+            8 * " "
+            + " ".join(
+                [
+                    self.name,
+                    str(float(self.gain)),
+                    str(float(self.hinge_x_location)),
+                    str(float(self.hinge_axis_location.x)),
+                    str(float(self.hinge_axis_location.y)),
+                    str(float(self.hinge_axis_location.z)),
+                    str(self.deflection.value),
+                ]
             ),
         ]
-        data.append(("", ""))
-        max_item_size = 1 + max(len(item) for item, _ in data)
-        return "\n".join(
-            [
-                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
-                for item, comment in data
-            ]
-        )
+        line_array.append("")
+        return "\n".join(line_array)
 
 
 @dataclass
@@ -293,72 +279,68 @@ class Section:
         """
         Export formatted string for the AVL input file
         """
-        data: list[tuple[str, str]] = [
-            (4 * " " + "SECTION", "(keyword)"),
-            (
-                4 * " "
-                + "  ".join(
-                    [
-                        str(self.location.x),
-                        str(self.location.y),
-                        str(self.location.z),
-                        str(self.chord),
-                        str(self.incremental_angle),
-                        (
-                            str(self.spanwise_vortice_count)
-                            if self.spanwise_vortice_count is not None
-                            else ""
-                        ),
-                        (
-                            str(self.spanwise_vortex_spacing)
-                            if self.spanwise_vortex_spacing is not None
-                            else ""
-                        ),
-                    ]
-                ),
-                "Xle Yle Zle Chord Ainc [ Nspan Sspace ]",
+        line_array: list[str] = [
+            4 * " " + "SECTION",
+            "",
+            "#" + 3 * " " + "Xle Yle Zle Chord Ainc [ Nspan Sspace ]",
+            4 * " "
+            + " ".join(
+                [
+                    str(float(self.location.x)),
+                    str(float(self.location.y)),
+                    str(float(self.location.z)),
+                    str(float(self.chord)),
+                    str(float(self.incremental_angle)),
+                    (
+                        str(self.spanwise_vortice_count)
+                        if self.spanwise_vortice_count is not None
+                        else ""
+                    ),
+                    (
+                        str(float(self.spanwise_vortex_spacing))
+                        if self.spanwise_vortex_spacing is not None
+                        else ""
+                    ),
+                ]
             ),
-            (8 * " " + "AFILE", "(keyword)"),
-            (8 * " " + self.airfoil.relative_path(), "filename string"),
+            "",
+            "#" + 7 * " " + "airfoil",
+            8 * " " + "AFILE",
+            8 * " " + self.airfoil.relative_path(),
         ]
         if self.cl_alpha_slope_scaling is not None:
-            data.extend(
+            line_array.extend(
                 [
-                    (8 * " " + "CLAF", "(keyword)"),
-                    (8 * " " + str(self.cl_alpha_slope_scaling), "dCL/da scaling factor"),
+                    "",
+                    "#" + 7 * " " + "dCL/da scaling factor",
+                    8 * " " + "CLAF",
+                    8 * " " + str(float(self.cl_alpha_slope_scaling)),
                 ]
             )
         if self.profile_drag_settings is not None:
-            data.extend(
+            line_array.extend(
                 [
-                    (8 * " " + "CDCL", "(keyword)"),
-                    (
-                        8 * " "
-                        + "  ".join(
-                            [
-                                str(self.profile_drag_settings.cl1),
-                                str(self.profile_drag_settings.cd1),
-                                str(self.profile_drag_settings.cl2),
-                                str(self.profile_drag_settings.cd2),
-                                str(self.profile_drag_settings.cl3),
-                                str(self.profile_drag_settings.cd3),
-                            ]
-                        ),
-                        "CD (CL) function parameters",
+                    "",
+                    "#" + 7 * " " + "CD (CL) function parameters",
+                    8 * " " + "CDCL",
+                    "",
+                    "#" + 7 * " " + "CL1 CD1 CL2 CD2 CL3 CD3",
+                    8 * " "
+                    + " ".join(
+                        [
+                            str(float(self.profile_drag_settings.cl1)),
+                            str(float(self.profile_drag_settings.cd1)),
+                            str(float(self.profile_drag_settings.cl2)),
+                            str(float(self.profile_drag_settings.cd2)),
+                            str(float(self.profile_drag_settings.cl3)),
+                            str(float(self.profile_drag_settings.cd3)),
+                        ]
                     ),
                 ]
             )
-        data.append(("", ""))
-        max_item_size = 1 + max(len(item) for item, _ in data)
-        return (
-            "\n".join(
-                [
-                    " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
-                    for item, comment in data
-                ]
-            )
-            + "\n"
-            + "\n".join([control.to_input_file() for control in self.control_array])
+        line_array.append("")
+        return "\n".join(line_array) + "\n".join(
+            [control.to_input_file() for control in self.control_array]
         )
 
 
@@ -405,70 +387,63 @@ class Body:
         """
         Export formatted string for the AVL input file
         """
-        data: list[tuple[str, str]] = [
-            ("BODY", "(keyword)"),
-            (self.name, "body name string"),
-            (
-                "  ".join(
-                    [
-                        str(self.node_count),
-                        str(self.node_spacing),
-                    ]
-                ),
-                "Nbody Bspace",
-            ),
+        line_array: list[str] = [
+            "BODY",
+            "",
+            "# body name string",
+            self.name,
+            "",
+            "# Nbody Bspace",
+            " ".join([str(self.node_count), str(float(self.node_spacing))]),
         ]
         if self.mirror_surface:
             if self.xz_plane_location is None:
                 raise RuntimeError("XY plane location must be defined if mirror surface is True")
-            data.extend(
+            line_array.extend(
                 [
-                    (4 * " " + "YDUPLICATE", "(keyword)"),
-                    (4 * " " + str(self.xz_plane_location), "Ydupl"),
+                    "",
+                    4 * " " + "YDUPLICATE",
+                    "",
+                    "#" + 3 * " " + "Ydupl",
+                    4 * " " + str(float(self.xz_plane_location)),
                 ]
             )
         if self.scale is not None:
-            data.extend(
+            line_array.extend(
                 [
-                    (4 * " " + "SCALE", "(keyword)"),
-                    (
-                        4 * " "
-                        + "  ".join(
-                            [
-                                str(self.scale.x),
-                                str(self.scale.y),
-                                str(self.scale.z),
-                            ]
-                        ),
-                        "Xscale Yscale Zscale",
+                    "",
+                    4 * " " + "SCALE",
+                    "",
+                    "#" + 3 * " " + "Xscale Yscale Zscale",
+                    4 * " "
+                    + " ".join(
+                        [
+                            str(float(self.scale.x)),
+                            str(float(self.scale.y)),
+                            str(float(self.scale.z)),
+                        ]
                     ),
                 ]
             )
         if self.translate is not None:
-            data.extend(
+            line_array.extend(
                 [
-                    (4 * " " + "TRANSLATE", "(keyword)"),
-                    (
-                        4 * " "
-                        + "  ".join(
-                            [
-                                str(self.translate.x),
-                                str(self.translate.y),
-                                str(self.translate.z),
-                            ]
-                        ),
-                        "dX     dY     dZ",
+                    "",
+                    4 * " " + "TRANSLATE",
+                    "",
+                    "#" + 3 * " " + "dX dY dZ",
+                    4 * " "
+                    + " ".join(
+                        [
+                            str(float(self.translate.x)),
+                            str(float(self.translate.y)),
+                            str(float(self.translate.z)),
+                        ]
                     ),
                 ]
             )
-        data.append(("", ""))
-        max_item_size = 1 + max(len(item) for item, _ in data)
-        return "\n".join(
-            [
-                " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
-                for item, comment in data
-            ]
-        )
+        line_array.append("")
+        return "\n".join(line_array)
 
 
 @dataclass
@@ -555,105 +530,116 @@ class Surface:
         """
         Export formatted string for the AVL input file
         """
-        data: list[tuple[str, str]] = [
-            ("SURFACE", "(keyword)"),
-            (self.name, "surface name string"),
-            (
-                "  ".join(
-                    [
-                        str(self.chordwise_vortice_count),
-                        str(self.chordwise_vortex_spacing),
-                        str(self.spanwise_vortice_count),
-                        str(self.spanwise_vortex_spacing),
-                    ]
-                ),
-                "Nchord Cspace [ Nspan Sspace ]",
+        line_array: list[str] = [
+            "SURFACE",
+            "",
+            "# surface name string",
+            self.name,
+            "",
+            "# Nchord Cspace [ Nspan Sspace ]",
+            " ".join(
+                [
+                    str(self.chordwise_vortice_count),
+                    str(float(self.chordwise_vortex_spacing)),
+                    (
+                        str(self.spanwise_vortice_count)
+                        if self.spanwise_vortice_count is not None
+                        else ""
+                    ),
+                    (
+                        str(float(self.spanwise_vortex_spacing))
+                        if self.spanwise_vortex_spacing is not None
+                        else ""
+                    ),
+                ]
             ),
         ]
         if self.mirror_surface:
             if self.xz_plane_location is None:
                 raise RuntimeError("XY plane location must be defined if mirror surface is True")
-            data.extend(
+            line_array.extend(
                 [
-                    (4 * " " + "YDUPLICATE", "(keyword)"),
-                    (4 * " " + str(self.xz_plane_location), "Ydupl"),
+                    "",
+                    4 * " " + "YDUPLICATE",
+                    "",
+                    "#" + 3 * " " + "Ydupl",
+                    4 * " " + str(float(self.xz_plane_location)),
                 ]
             )
         if self.scale is not None:
-            data.extend(
+            line_array.extend(
                 [
-                    (4 * " " + "SCALE", "(keyword)"),
-                    (
-                        4 * " "
-                        + "  ".join(
-                            [
-                                str(self.scale.x),
-                                str(self.scale.y),
-                                str(self.scale.z),
-                            ]
-                        ),
-                        "Xscale Yscale Zscale",
+                    "",
+                    4 * " " + "SCALE",
+                    "",
+                    "#" + 3 * " " + "Xscale Yscale Zscale",
+                    4 * " "
+                    + " ".join(
+                        [
+                            str(float(self.scale.x)),
+                            str(float(self.scale.y)),
+                            str(float(self.scale.z)),
+                        ]
                     ),
                 ]
             )
         if self.translate is not None:
-            data.extend(
+            line_array.extend(
                 [
-                    (4 * " " + "TRANSLATE", "(keyword)"),
-                    (
-                        4 * " "
-                        + "  ".join(
-                            [
-                                str(self.translate.x),
-                                str(self.translate.y),
-                                str(self.translate.z),
-                            ]
-                        ),
-                        "dX     dY     dZ",
+                    "",
+                    4 * " " + "TRANSLATE",
+                    "",
+                    "#" + 3 * " " + "dX dY dZ",
+                    4 * " "
+                    + " ".join(
+                        [
+                            str(float(self.translate.x)),
+                            str(float(self.translate.y)),
+                            str(float(self.translate.z)),
+                        ]
                     ),
                 ]
             )
         if self.incremental_angle is not None:
-            data.extend(
-                [(4 * " " + "ANGLE", "(keyword)"), (4 * " " + str(self.incremental_angle), "dAinc")]
+            line_array.extend(
+                [
+                    "",
+                    4 * " " + "ANGLE",
+                    "",
+                    "#" + 3 * " " + "dAinc",
+                    4 * " " + str(float(self.incremental_angle)),
+                ]
             )
         if self.ignore_wake:
-            data.append((4 * " " + "NOWAKE", "(keyword)"))
+            line_array.append(4 * " " + "NOWAKE")
         if self.ignore_freestream_effect:
-            data.append((4 * " " + "NOALBE", "(keyword)"))
+            line_array.append(4 * " " + "NOALBE")
         if self.ignore_load_contribution:
-            data.append((4 * " " + "NOLOAD", "(keyword)"))
+            line_array.append(4 * " " + "NOLOAD")
         if self.profile_drag_settings is not None:
-            data.extend(
+            line_array.extend(
                 [
-                    (4 * " " + "CDCL", "(keyword)"),
-                    (
-                        4 * " "
-                        + "  ".join(
-                            [
-                                str(self.profile_drag_settings.cl1),
-                                str(self.profile_drag_settings.cd1),
-                                str(self.profile_drag_settings.cl2),
-                                str(self.profile_drag_settings.cd2),
-                                str(self.profile_drag_settings.cl3),
-                                str(self.profile_drag_settings.cd3),
-                            ]
-                        ),
-                        "CD (CL) function parameters",
+                    "",
+                    "#" + 3 * " " + "CD (CL) function parameters",
+                    4 * " " + "CDCL",
+                    "",
+                    "#" + 3 * " " + "CL1 CD1 CL2 CD2 CL3 CD3",
+                    4 * " "
+                    + " ".join(
+                        [
+                            str(float(self.profile_drag_settings.cl1)),
+                            str(float(self.profile_drag_settings.cd1)),
+                            str(float(self.profile_drag_settings.cl2)),
+                            str(float(self.profile_drag_settings.cd2)),
+                            str(float(self.profile_drag_settings.cl3)),
+                            str(float(self.profile_drag_settings.cd3)),
+                        ]
                     ),
                 ]
             )
-        data.append(("", ""))
-        max_item_size = 1 + max(len(item) for item, _ in data)
-        return (
-            "\n".join(
-                [
-                    " | ".join([item.ljust(max_item_size), comment]) if comment != "" else item
-                    for item, comment in data
-                ]
-            )
-            + "\n"
-            + "\n".join([section.to_input_file() for section in self.section_array])
+        line_array.append("")
+        return "\n".join(line_array) + "\n".join(
+            [section.to_input_file() for section in self.section_array]
         )
 
 
