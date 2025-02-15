@@ -72,5 +72,5 @@ avl_input = avl.Input(
     body_array=[],
 )
 
-with open(os.path.join(os.getcwd(), AVL_PATH, "input.txt"), "w", encoding="utf-8") as f:
+with open(os.path.join(os.getcwd(), AVL_PATH, "input.avl"), "w", encoding="utf-8") as f:
     f.write(avl_input.to_input_file())
