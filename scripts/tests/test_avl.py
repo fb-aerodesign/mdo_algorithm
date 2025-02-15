@@ -2,7 +2,10 @@
 This script tests the AVL tools
 """
 
+import os
+
 from mdo_algorithm.disciplines.common.models.geometries import Xyz
+from mdo_algorithm.disciplines.aerodynamics.constants import AVL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     Airfoil,
     WingSection,
@@ -69,4 +72,5 @@ avl_input = avl.Input(
     body_array=[],
 )
 
-print(avl_input.to_input_file())
+with open(os.path.join(os.getcwd(), AVL_PATH, "input.txt"), "w", encoding="utf-8") as f:
+    f.write(avl_input.to_input_file())
