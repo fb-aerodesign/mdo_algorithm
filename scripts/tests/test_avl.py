@@ -8,17 +8,17 @@ from mdo_algorithm.disciplines.common.models.geometries import Xyz
 from mdo_algorithm.disciplines.aerodynamics.constants import AVL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     Airfoil,
-    WingSection,
+    SurfaceSection,
     Wing,
 )
 from mdo_algorithm.disciplines.aerodynamics.models import avl
 
 wing = Wing(
     section_array=[
-        WingSection(
+        SurfaceSection(
             location=Xyz(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
         ),
-        WingSection(
+        SurfaceSection(
             location=Xyz(0.15, 1.15, 0), chord=0.3, incremental_angle=0, airfoil=Airfoil("s1223")
         ),
     ]
