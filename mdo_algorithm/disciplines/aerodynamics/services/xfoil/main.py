@@ -10,10 +10,7 @@ from pandera.typing import DataFrame
 
 import matplotlib.pyplot as plt
 
-from mdo_algorithm.disciplines.aerodynamics.constants import (
-    AIRFOILS_PATH,
-    XFOIL_PATH,
-)
+from mdo_algorithm.disciplines.aerodynamics.constants import XFOIL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
 from mdo_algorithm.disciplines.aerodynamics.models.xfoil import Coefficients
 
@@ -70,9 +67,8 @@ class XfoilService:
         :return: DataFrame containing the aerodynamic coefficients.
         :rtype: DataFrame[Coefficients]
         """
-        airfoil_path = os.path.join(AIRFOILS_PATH, f"{airfoil.name}.dat")
         result_file_path = os.path.join(XFOIL_PATH, "result.txt")
-        commands = [f"LOAD {airfoil_path}"]
+        commands = [f"LOAD {airfoil.relative_path()}"]
         commands.append("PANE")
         commands.append("OPER")
         if reynolds is not None:
@@ -137,4 +133,22 @@ class XfoilService:
         ax3.legend()
         ax4.set_title("Cl/Cd x alpha")
         ax4.legend()
+        plt.show()
+
+    def plot_drag_polar(self, coefficients_array: list[DataFrame[Coefficients]]) -> None:
+        """
+        Plot the drag polar.
+
+        :param coefficients_array: List of DataFrames containing the aerodynamic coefficients.
+        :type coefficients_array: list[DataFrame[Coefficients]]
+        """
+        fig, ax = plt.subplots()
+        fig.suptitle("Drag Polar")
+        for coefficients in coefficients_array:
+            airfoil: str = coefficients.attrs["airfoil"]
+            re: float | None = coefficients.attrs["reynolds"]
+            label = " | ".join([airfoil, f"Re{re:.3e}" if re is not None else "Inviscid"])
+            ax.plot(coefficients["Cl"], coefficients["Cd"], label=label)
+        ax.set_title("Cd x Cl")
+        ax.legend()
         plt.show()
