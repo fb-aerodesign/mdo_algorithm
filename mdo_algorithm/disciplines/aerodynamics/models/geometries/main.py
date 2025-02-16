@@ -35,9 +35,9 @@ class Airfoil:
 
 
 @dataclass
-class WingSection:
+class SurfaceSection:
     """
-    Represents a section of the wing.
+    Represents a section of the lifting surface.
 
     :param leading_edge_location: Location of the airfoil's leading edge
     :type leading_edge_location: Xyz
@@ -65,7 +65,7 @@ class Wing:
     Contains methods to calculate geometric parameters.
     """
 
-    section_array: list[WingSection] = field(default_factory=list)
+    section_array: list[SurfaceSection] = field(default_factory=list)
 
     def span(self) -> float:
         """
