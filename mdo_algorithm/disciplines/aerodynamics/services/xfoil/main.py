@@ -6,8 +6,7 @@ import os
 import subprocess
 
 import pandas as pd
-import pandera as pa
-from pandera.typing import DataFrame, Index, Series
+from pandera.typing import DataFrame
 
 import matplotlib.pyplot as plt
 
@@ -16,19 +15,7 @@ from mdo_algorithm.disciplines.aerodynamics.constants import (
     XFOIL_PATH,
 )
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-
-
-class Coefficients(pa.DataFrameModel):
-    """
-    DataFrame model for aerodynamic coefficients.
-    """
-
-    idx: Index[int]
-    alpha: Series[float]
-    Cl: Series[float]
-    Cd: Series[float]
-    Cd_pressure: Series[float]
-    Cm: Series[float]
+from mdo_algorithm.disciplines.aerodynamics.models.xfoil import Coefficients
 
 
 class XfoilService:
