@@ -4,6 +4,6 @@ Aerodynamics geometry models module
 
 from .main import (
     Airfoil,
-    WingSection,
+    SurfaceSection,
     Wing,
 )
