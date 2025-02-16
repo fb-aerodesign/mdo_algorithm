@@ -2,7 +2,4 @@
 Xfoil service module
 """
 
-from .main import (
-    XfoilService,
-    Coefficients,
-)
+from .main import XfoilService
