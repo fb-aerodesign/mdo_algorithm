@@ -9,7 +9,8 @@ from mdo_algorithm.disciplines.common.functions import (
 )
 
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService, Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.xfoil import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService
 
 analysis_parameters = {
     "alpha": (0, 20, 0.5),
