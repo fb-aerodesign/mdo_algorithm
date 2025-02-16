@@ -133,8 +133,9 @@ class Header:
             ),
         ]
         if self.default_profile_drag_coefficient is not None:
-            line_array.extend(["", "# CDp", str(float(self.default_profile_drag_coefficient))])
-        line_array.append("")
+            line_array.extend(["", "# CDp", str(float(self.default_profile_drag_coefficient)), ""])
+        if line_array[-1] != "":
+            line_array.append("")
         return "\n".join(line_array)
 
 
@@ -207,11 +208,10 @@ class Control:
         Export formatted string for the AVL input file
         """
         line_array: list[str] = [
-            8 * " " + "CONTROL",
+            "CONTROL",
             "",
-            "#" + 7 * " " + "name, gain, Xhinge, XYZhvec, SgnDup",
-            8 * " "
-            + " ".join(
+            "# name, gain, Xhinge, XYZhvec, SgnDup",
+            " ".join(
                 [
                     self.name,
                     str(float(self.gain)),
@@ -222,8 +222,8 @@ class Control:
                     str(self.deflection.value),
                 ]
             ),
+            "",
         ]
-        line_array.append("")
         return "\n".join(line_array)
 
 
@@ -280,11 +280,10 @@ class Section:
         Export formatted string for the AVL input file
         """
         line_array: list[str] = [
-            4 * " " + "SECTION",
+            "SECTION",
             "",
-            "#" + 3 * " " + "Xle Yle Zle Chord Ainc [ Nspan Sspace ]",
-            4 * " "
-            + " ".join(
+            "# Xle Yle Zle Chord Ainc [ Nspan Sspace ]",
+            " ".join(
                 [
                     str(float(self.location.x)),
                     str(float(self.location.y)),
@@ -304,29 +303,29 @@ class Section:
                 ]
             ),
             "",
-            "#" + 7 * " " + "airfoil",
-            8 * " " + "AFILE",
-            8 * " " + self.airfoil.relative_path(),
+            "# airfoil",
+            "AFILE",
+            self.airfoil.relative_path(),
         ]
         if self.cl_alpha_slope_scaling is not None:
             line_array.extend(
                 [
                     "",
-                    "#" + 7 * " " + "dCL/da scaling factor",
-                    8 * " " + "CLAF",
-                    8 * " " + str(float(self.cl_alpha_slope_scaling)),
+                    "# dCL/da scaling factor",
+                    "CLAF",
+                    str(float(self.cl_alpha_slope_scaling)),
+                    "",
                 ]
             )
         if self.profile_drag_settings is not None:
             line_array.extend(
                 [
                     "",
-                    "#" + 7 * " " + "CD (CL) function parameters",
-                    8 * " " + "CDCL",
+                    "# CD (CL) function parameters",
+                    "CDCL",
                     "",
-                    "#" + 7 * " " + "CL1 CD1 CL2 CD2 CL3 CD3",
-                    8 * " "
-                    + " ".join(
+                    "# CL1 CD1 CL2 CD2 CL3 CD3",
+                    " ".join(
                         [
                             str(float(self.profile_drag_settings.cl1)),
                             str(float(self.profile_drag_settings.cd1)),
@@ -336,9 +335,11 @@ class Section:
                             str(float(self.profile_drag_settings.cd3)),
                         ]
                     ),
+                    "",
                 ]
             )
-        line_array.append("")
+        if line_array[-1] != "":
+            line_array.append("")
         return "\n".join(line_array) + "\n".join(
             [control.to_input_file() for control in self.control_array]
         )
@@ -402,47 +403,49 @@ class Body:
             line_array.extend(
                 [
                     "",
-                    4 * " " + "YDUPLICATE",
+                    "YDUPLICATE",
                     "",
-                    "#" + 3 * " " + "Ydupl",
-                    4 * " " + str(float(self.xz_plane_location)),
+                    "# Ydupl",
+                    str(float(self.xz_plane_location)),
+                    "",
                 ]
             )
         if self.scale is not None:
             line_array.extend(
                 [
                     "",
-                    4 * " " + "SCALE",
+                    "SCALE",
                     "",
-                    "#" + 3 * " " + "Xscale Yscale Zscale",
-                    4 * " "
-                    + " ".join(
+                    "# Xscale Yscale Zscale",
+                    " ".join(
                         [
                             str(float(self.scale.x)),
                             str(float(self.scale.y)),
                             str(float(self.scale.z)),
                         ]
                     ),
+                    "",
                 ]
             )
         if self.translate is not None:
             line_array.extend(
                 [
                     "",
-                    4 * " " + "TRANSLATE",
+                    "TRANSLATE",
                     "",
-                    "#" + 3 * " " + "dX dY dZ",
-                    4 * " "
-                    + " ".join(
+                    "# dX dY dZ",
+                    " ".join(
                         [
                             str(float(self.translate.x)),
                             str(float(self.translate.y)),
                             str(float(self.translate.z)),
                         ]
                     ),
+                    "",
                 ]
             )
-        line_array.append("")
+        if line_array[-1] != "":
+            line_array.append("")
         return "\n".join(line_array)
 
 
@@ -560,72 +563,73 @@ class Surface:
             line_array.extend(
                 [
                     "",
-                    4 * " " + "YDUPLICATE",
+                    "YDUPLICATE",
                     "",
-                    "#" + 3 * " " + "Ydupl",
-                    4 * " " + str(float(self.xz_plane_location)),
+                    "# Ydupl",
+                    str(float(self.xz_plane_location)),
+                    "",
                 ]
             )
         if self.scale is not None:
             line_array.extend(
                 [
                     "",
-                    4 * " " + "SCALE",
+                    "SCALE",
                     "",
-                    "#" + 3 * " " + "Xscale Yscale Zscale",
-                    4 * " "
-                    + " ".join(
+                    "# Xscale Yscale Zscale",
+                    " ".join(
                         [
                             str(float(self.scale.x)),
                             str(float(self.scale.y)),
                             str(float(self.scale.z)),
                         ]
                     ),
+                    "",
                 ]
             )
         if self.translate is not None:
             line_array.extend(
                 [
                     "",
-                    4 * " " + "TRANSLATE",
+                    "TRANSLATE",
                     "",
-                    "#" + 3 * " " + "dX dY dZ",
-                    4 * " "
-                    + " ".join(
+                    "# dX dY dZ",
+                    " ".join(
                         [
                             str(float(self.translate.x)),
                             str(float(self.translate.y)),
                             str(float(self.translate.z)),
                         ]
                     ),
+                    "",
                 ]
             )
         if self.incremental_angle is not None:
             line_array.extend(
                 [
                     "",
-                    4 * " " + "ANGLE",
+                    "ANGLE",
                     "",
-                    "#" + 3 * " " + "dAinc",
-                    4 * " " + str(float(self.incremental_angle)),
+                    "# dAinc",
+                    str(float(self.incremental_angle)),
+                    "",
                 ]
             )
         if self.ignore_wake:
-            line_array.append(4 * " " + "NOWAKE")
+            line_array.extend(["NOWAKE", ""])
         if self.ignore_freestream_effect:
-            line_array.append(4 * " " + "NOALBE")
+            line_array.extend(["NOALBE", ""])
         if self.ignore_load_contribution:
-            line_array.append(4 * " " + "NOLOAD")
+            line_array.extend(["NOLOAD", ""])
         if self.profile_drag_settings is not None:
             line_array.extend(
                 [
                     "",
-                    "#" + 3 * " " + "CD (CL) function parameters",
-                    4 * " " + "CDCL",
+                    "# CD (CL) function parameters",
+                    "CDCL",
                     "",
-                    "#" + 3 * " " + "CL1 CD1 CL2 CD2 CL3 CD3",
-                    4 * " "
-                    + " ".join(
+                    "# CL1 CD1 CL2 CD2 CL3 CD3",
+                    " ".join(
                         [
                             str(float(self.profile_drag_settings.cl1)),
                             str(float(self.profile_drag_settings.cd1)),
@@ -635,11 +639,16 @@ class Surface:
                             str(float(self.profile_drag_settings.cd3)),
                         ]
                     ),
+                    "",
                 ]
             )
-        line_array.append("")
-        return "\n".join(line_array) + "\n".join(
-            [section.to_input_file() for section in self.section_array]
+        if line_array[-1] != "":
+            line_array.append("")
+        return "\n".join(
+            [
+                "\n".join(line_array),
+                "\n".join([section.to_input_file() for section in self.section_array]),
+            ]
         )
 
 
