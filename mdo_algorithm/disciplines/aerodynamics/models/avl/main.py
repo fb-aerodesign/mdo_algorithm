@@ -172,6 +172,30 @@ class ProfileDragSettings:
     cl3: float
     cd3: float
 
+    @staticmethod
+    def from_xfoil_coefficients(coefficients: DataFrame[Coefficients]) -> "ProfileDragSettings":
+        """
+        Create profile drag settings from XFOIL coefficients.
+
+        :param coefficients: XFOIL coefficients for the airfoil.
+        :type coefficients: DataFrame[Coefficients]
+
+        :return: Profile drag settings based on the coefficients.
+        :rtype: ProfileDragSettings
+        """
+        return ProfileDragSettings(
+            cl1=float(coefficients["lift_coefficient"].min()),
+            cd1=float(
+                coefficients.at[coefficients["lift_coefficient"].idxmin(), "drag_coefficient"]
+            ),
+            cl2=float(coefficients.loc[coefficients["alpha"] == 0, "lift_coefficient"].values[0]),
+            cd2=float(coefficients.loc[coefficients["alpha"] == 0, "drag_coefficient"].values[0]),
+            cl3=float(coefficients["lift_coefficient"].max()),
+            cd3=float(
+                coefficients.at[coefficients["lift_coefficient"].idxmax(), "drag_coefficient"]
+            ),
+        )
+
 
 @dataclass
 class Control:
