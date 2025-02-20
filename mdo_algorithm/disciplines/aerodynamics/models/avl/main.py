@@ -8,8 +8,11 @@ It provides classes to represent key AVL input parameters.
 from dataclasses import dataclass
 from enum import IntEnum
 
+from pandera.typing import DataFrame
+
 from mdo_algorithm.disciplines.common.models.geometries import Xyz
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
+from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
 
 
 class Symmetry(IntEnum):
