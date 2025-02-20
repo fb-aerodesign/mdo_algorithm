@@ -1,5 +1,5 @@
 """
-This script tests the XFOIL tools
+Get 2D coefficients
 """
 
 from pandera.typing import DataFrame
@@ -9,8 +9,9 @@ from mdo_algorithm.disciplines.common.functions import (
 )
 
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-from mdo_algorithm.disciplines.aerodynamics.models.xfoil import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService
+from mdo_algorithm.disciplines.aerodynamics.functions import plot_coefficients
 
 analysis_parameters = {
     "alpha": (0, 20, 0.5),
@@ -24,4 +25,4 @@ coefficients_array.append(
     xfoil_service.get_coefficients(Airfoil("fx74modsm"), **analysis_parameters)
 )
 coefficients_array.append(xfoil_service.get_coefficients(Airfoil("s1223"), **analysis_parameters))
-xfoil_service.plot_coefficients(coefficients_array)
+plot_coefficients(coefficients_array)
