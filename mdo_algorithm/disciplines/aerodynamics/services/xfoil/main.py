@@ -8,11 +8,9 @@ import subprocess
 import pandas as pd
 from pandera.typing import DataFrame
 
-import matplotlib.pyplot as plt
-
 from mdo_algorithm.disciplines.aerodynamics.constants import XFOIL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-from mdo_algorithm.disciplines.aerodynamics.models.xfoil import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
 
 
 class XfoilService:
@@ -91,64 +89,24 @@ class XfoilService:
         df = DataFrame[Coefficients](
             pd.read_fwf(
                 result_file_path,
-                colspecs=[(2, 8), (10, 17), (19, 27), (29, 37), (39, 46)],
-                names=["alpha", "Cl", "Cd", "Cd_pressure", "Cm"],
+                colspecs=[(2, 8), (10, 17), (19, 27), (39, 46)],
+                names=["alpha", "lift_coefficient", "drag_coefficient", "moment_coefficient"],
                 dtype={
                     "alpha": float,
-                    "Cl": float,
-                    "Cd": float,
-                    "Cd_pressure": float,
-                    "Cm": float,
+                    "lift_coefficient": float,
+                    "drag_coefficient": float,
+                    "moment_coefficient": float,
                 },
                 skiprows=12,
             )
         )
-        df.attrs["airfoil"] = airfoil.name
-        df.attrs["reynolds"] = reynolds
+        df.attrs["legend"] = " | ".join(
+            [
+                "XFOIL",
+                "2D",
+                f"Airfoil {airfoil.name}",
+                f"Re={reynolds:.3e}" if reynolds is not None else "Inviscid",
+            ]
+        )
         os.remove(result_file_path)
         return df
-
-    def plot_coefficients(self, coefficients_array: list[DataFrame[Coefficients]]) -> None:
-        """
-        Plot the aerodynamic coefficients.
-
-        :param coefficients_array: List of DataFrames containing the aerodynamic coefficients.
-        :type coefficients_array: list[DataFrame[Coefficients]]
-        """
-        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-        fig.suptitle("Coefficients")
-        for coefficients in coefficients_array:
-            airfoil: str = coefficients.attrs["airfoil"]
-            re: float | None = coefficients.attrs["reynolds"]
-            label = " | ".join([airfoil, f"Re{re:.3e}" if re is not None else "Inviscid"])
-            ax1.plot(coefficients["alpha"], coefficients["Cl"], label=label)
-            ax2.plot(coefficients["alpha"], coefficients["Cd"], label=label)
-            ax3.plot(coefficients["alpha"], coefficients["Cm"], label=label)
-            ax4.plot(coefficients["alpha"], coefficients["Cl"] / coefficients["Cd"], label=label)
-        ax1.set_title("Cl x alpha")
-        ax1.legend()
-        ax2.set_title("Cd x alpha")
-        ax2.legend()
-        ax3.set_title("Cm x alpha")
-        ax3.legend()
-        ax4.set_title("Cl/Cd x alpha")
-        ax4.legend()
-        plt.show()
-
-    def plot_drag_polar(self, coefficients_array: list[DataFrame[Coefficients]]) -> None:
-        """
-        Plot the drag polar.
-
-        :param coefficients_array: List of DataFrames containing the aerodynamic coefficients.
-        :type coefficients_array: list[DataFrame[Coefficients]]
-        """
-        fig, ax = plt.subplots()
-        fig.suptitle("Drag Polar")
-        for coefficients in coefficients_array:
-            airfoil: str = coefficients.attrs["airfoil"]
-            re: float | None = coefficients.attrs["reynolds"]
-            label = " | ".join([airfoil, f"Re{re:.3e}" if re is not None else "Inviscid"])
-            ax.plot(coefficients["Cl"], coefficients["Cd"], label=label)
-        ax.set_title("Cd x Cl")
-        ax.legend()
-        plt.show()
