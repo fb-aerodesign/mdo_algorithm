@@ -399,7 +399,7 @@ class Body:
         ]
         if self.mirror_surface:
             if self.xz_plane_location is None:
-                raise RuntimeError("XY plane location must be defined if mirror surface is True")
+                raise ValueError("XY plane location must be defined if mirror surface is True")
             line_array.extend(
                 [
                     "",
@@ -559,7 +559,7 @@ class Surface:
         ]
         if self.mirror_surface:
             if self.xz_plane_location is None:
-                raise RuntimeError("XY plane location must be defined if mirror surface is True")
+                raise ValueError("XY plane location must be defined if mirror surface is True")
             line_array.extend(
                 [
                     "",
