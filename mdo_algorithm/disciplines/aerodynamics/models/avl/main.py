@@ -320,7 +320,6 @@ class Section:
         if self.profile_drag_settings is not None:
             line_array.extend(
                 [
-                    "",
                     "# CD (CL) function parameters",
                     "CDCL",
                     "",
