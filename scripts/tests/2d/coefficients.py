@@ -9,7 +9,7 @@ from mdo_algorithm.disciplines.common.functions import (
 )
 
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.dataframe import Coefficients
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService
 from mdo_algorithm.disciplines.aerodynamics.functions import plot_coefficients
 
@@ -20,7 +20,7 @@ def main():
     """
     analysis_parameters = {
         "alpha": (0, 20, 0.5),
-        "reynolds": reynolds_number(12, 1, 660, 20),
+        "reynolds": reynolds_number(12, 0.5, 660, 20),
         "iterations": 1000,
     }
 
