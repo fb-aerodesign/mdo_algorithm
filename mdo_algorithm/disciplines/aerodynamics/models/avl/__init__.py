@@ -11,5 +11,6 @@ from .main import (
     Section,
     Body,
     Surface,
-    Input,
+    GeometryInput,
+    MassInput,
 )
