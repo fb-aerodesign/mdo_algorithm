@@ -57,13 +57,13 @@ def plot_coefficients(coefficients_array: list[DataFrame[Coefficients]]) -> None
             legend = True
     if legend:
         fig.legend()
-    ax1.set_xlabel("alpha [°]")
+    ax1.set_xlabel("α [°]")
     ax1.set_ylabel("lift coefficient")
-    ax2.set_xlabel("alpha [°]")
+    ax2.set_xlabel("α [°]")
     ax2.set_ylabel("drag coefficient")
-    ax3.set_xlabel("alpha [°]")
+    ax3.set_xlabel("α [°]")
     ax3.set_ylabel("moment coefficient")
-    ax4.set_xlabel("alpha [°]")
+    ax4.set_xlabel("α [°]")
     ax4.set_ylabel("lift coefficient/drag coefficient")
     plt.show()
 
@@ -87,4 +87,39 @@ def plot_drag_polar(coefficients_array: list[DataFrame[Coefficients]]) -> None:
         fig.legend()
     ax.set_xlabel("lift coefficient")
     ax.set_ylabel("drag coefficient")
+    plt.show()
+
+
+def plot_lift_distribution(
+    lift_distribution_array: list[DataFrame[LiftCoefficientDistribution]],
+    label_array: list[str] | None = None,
+) -> None:
+    """
+    Plot the lift coefficient distribution.
+
+    :param lift_distribution: DataFrame containing the lift coefficient distribution.
+    :type lift_distribution: DataFrame[LiftCoefficientDistribution]
+    """
+    fig, ax = plt.subplots()
+    fig.suptitle("Drag Polar")
+    legend = False
+    for lift_distribution in lift_distribution_array:
+        (line,) = ax.plot(
+            lift_distribution["spanwise_location"], lift_distribution["lift_coefficient"]
+        )
+        label = None
+        if label_array:
+            label = label_array.pop(0)
+        if "legend" in lift_distribution.attrs:
+            if label is not None:
+                label += " | " + lift_distribution.attrs["legend"]
+            else:
+                label = lift_distribution.attrs["legend"]
+        if label is not None:
+            line.set_label(label)
+            legend = True
+    if legend:
+        ax.legend()
+    ax.set_xlabel("spanwise location [m]")
+    ax.set_ylabel("lift coefficient")
     plt.show()
