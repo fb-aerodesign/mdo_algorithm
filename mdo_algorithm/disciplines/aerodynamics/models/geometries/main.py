@@ -12,7 +12,10 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy.integrate import quad
 
-from mdo_algorithm.disciplines.common.models.geometries import Xyz
+from mdo_algorithm.disciplines.common.models.geometries import (
+    Xyz,
+    MassProperties,
+)
 from mdo_algorithm.disciplines.aerodynamics.constants import AIRFOILS_PATH
 
 
@@ -66,6 +69,7 @@ class Wing:
     """
 
     section_array: list[SurfaceSection] = field(default_factory=list)
+    mass_properties: MassProperties = field(default_factory=MassProperties)
 
     def span(self) -> float:
         """
