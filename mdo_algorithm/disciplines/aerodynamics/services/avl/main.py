@@ -5,24 +5,22 @@ This module provides services to interact with AVL for aerodynamic analysis.
 import os
 import subprocess
 import re
+import io
 
 import numpy as np
 import pandas as pd
 from pandera.typing import DataFrame
 
-from mdo_algorithm.disciplines.common.models.geometries import Xyz
 from mdo_algorithm.disciplines.aerodynamics.constants import AVL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Wing
-from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
-from mdo_algorithm.disciplines.aerodynamics.models.avl import (
-    Symmetry,
-    ProfileDragSettings,
-    Section,
-    Surface,
-    Header,
-    Input,
+from mdo_algorithm.disciplines.aerodynamics.models.dataframe import (
+    Coefficients,
+    LiftCoefficientDistribution,
 )
-from mdo_algorithm.disciplines.aerodynamics.functions import cl_alpha_slope
+from mdo_algorithm.disciplines.aerodynamics.models.avl import (
+    GeometryInput,
+    MassInput,
+)
 
 
 class AvlService:
@@ -34,7 +32,8 @@ class AvlService:
         """
         Initialize AVL service
         """
-        self.__input_file_path = os.path.join(AVL_PATH, "input.avl")
+        self.__geometry_input_file_path = os.path.join(AVL_PATH, "input.avl")
+        self.__mass_input_file_path = os.path.join(AVL_PATH, "input.mass")
         self.__result_file_path = os.path.join(AVL_PATH, "result.txt")
 
     def run_avl(self, commands: list[str]) -> None:
@@ -44,10 +43,10 @@ class AvlService:
         :param commands: A list of commands to pass to XFOIL.
         :type commands: list[str]
         """
-        if not os.path.exists(os.path.join(os.getcwd(), self.__input_file_path)):
+        if not os.path.exists(os.path.join(os.getcwd(), self.__geometry_input_file_path)):
             raise FileNotFoundError("AVL input file not found")
         with subprocess.Popen(
-            [os.path.join(AVL_PATH, "avl.exe"), self.__input_file_path],
+            [os.path.join(AVL_PATH, "avl.exe"), self.__geometry_input_file_path],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -60,6 +59,11 @@ class AvlService:
         wing: Wing,
         xfoil_coefficients_array: list[DataFrame[Coefficients]],
         alpha: list[float] | tuple[float, float, float],
+        length_unit_meters: float = 1,
+        mass_unit_kilograms: float = 1,
+        time_unit_seconds: float = 1,
+        gravitational_acceleration: float | None = None,
+        air_density: float | None = None,
     ) -> DataFrame[Coefficients]:
         """
         Get the wing coefficients using AVL.
@@ -78,63 +82,23 @@ class AvlService:
         :return: DataFrame containing the aerodynamic coefficients.
         :rtype: DataFrame[Coefficients]
         """
-        if len(wing.section_array) != len(xfoil_coefficients_array):
-            raise ValueError(
-                "The number of wing sections must be equal to the number of XFOIL coefficients"
-            )
-        avl_input = Input(
-            header=Header(
-                title="Plane",
-                default_mach_number=0,
-                y_symmetry=Symmetry.IGNORE,
-                z_symmetry=Symmetry.IGNORE,
-                xy_plane_location=0,
-                reference_area=round(wing.planform_area(), 3),
-                reference_chord=round(wing.mean_aerodynamic_chord(), 3),
-                reference_span=wing.span(),
-                default_location=Xyz(0, 0, 0),
-                default_profile_drag_coefficient=None,
-            ),
-            surface_array=[
-                Surface(
-                    name="Wing",
-                    chordwise_vortice_count=12,
-                    chordwise_vortex_spacing=1,
-                    spanwise_vortice_count=20,
-                    spanwise_vortex_spacing=-1.5,
-                    mirror_surface=True,
-                    xz_plane_location=0,
-                    scale=None,
-                    translate=None,
-                    incremental_angle=None,
-                    ignore_wake=False,
-                    ignore_freestream_effect=False,
-                    ignore_load_contribution=False,
-                    profile_drag_settings=None,
-                    section_array=[
-                        Section(
-                            location=wing_section.location,
-                            chord=wing_section.chord,
-                            incremental_angle=wing_section.incremental_angle,
-                            spanwise_vortice_count=None,
-                            spanwise_vortex_spacing=None,
-                            airfoil=wing_section.airfoil,
-                            control_array=[],
-                            cl_alpha_slope_scaling=round(
-                                cl_alpha_slope(xfoil_coefficients_array[i]) / (2 * np.pi), 3
-                            ),
-                            profile_drag_settings=ProfileDragSettings.from_xfoil_coefficients(
-                                xfoil_coefficients_array[i]
-                            ),
-                        )
-                        for i, wing_section in enumerate(wing.section_array)
-                    ],
-                )
-            ],
-            body_array=[],
+        geometry_input = GeometryInput.from_wing(wing, xfoil_coefficients_array)
+        with open(
+            os.path.join(os.getcwd(), self.__geometry_input_file_path), "w", encoding="utf-8"
+        ) as f:
+            geometry_input.to_avl(f)
+        mass_input = MassInput.from_wing(
+            wing,
+            length_unit_meters=length_unit_meters,
+            mass_unit_kilograms=mass_unit_kilograms,
+            time_unit_seconds=time_unit_seconds,
+            gravitational_acceleration=gravitational_acceleration,
+            air_density=air_density,
         )
-        with open(os.path.join(os.getcwd(), self.__input_file_path), "w", encoding="utf-8") as f:
-            f.write(avl_input.to_input_file())
+        with open(
+            os.path.join(os.getcwd(), self.__mass_input_file_path), "w", encoding="utf-8"
+        ) as f:
+            mass_input.to_mass(f)
         commands = ["OPER"]
         append = False
         if isinstance(alpha, tuple):
@@ -161,7 +125,8 @@ class AvlService:
                 Coefficients.to_schema().columns.keys(), zip(*pattern.findall(content))
             )
         }
-        os.remove(self.__input_file_path)
+        os.remove(self.__geometry_input_file_path)
+        os.remove(self.__mass_input_file_path)
         os.remove(self.__result_file_path)
         df = DataFrame[Coefficients](pd.DataFrame(data))
         df.attrs["legend"] = " | ".join(
@@ -174,4 +139,88 @@ class AvlService:
                 f"B={round(wing.span(), 3)}m",
             ]
         )
+        return df
+
+    def get_wing_lift_coefficient_distribution(
+        self,
+        wing: Wing,
+        xfoil_coefficients_array: list[DataFrame[Coefficients]],
+        alpha: float = 0,
+        bank_angle: float = 0,
+        length_unit_meters: float = 1,
+        mass_unit_kilograms: float = 1,
+        time_unit_seconds: float = 1,
+        gravitational_acceleration: float | None = None,
+        air_density: float | None = None,
+    ) -> DataFrame[LiftCoefficientDistribution]:
+        """
+        Get the wing lift coefficient distribution using AVL.
+        """
+        geometry_input = GeometryInput.from_wing(wing, xfoil_coefficients_array)
+        with open(
+            os.path.join(os.getcwd(), self.__geometry_input_file_path), "w", encoding="utf-8"
+        ) as f:
+            geometry_input.to_avl(f)
+        mass_input = MassInput.from_wing(
+            wing,
+            length_unit_meters=length_unit_meters,
+            mass_unit_kilograms=mass_unit_kilograms,
+            time_unit_seconds=time_unit_seconds,
+            gravitational_acceleration=gravitational_acceleration,
+            air_density=air_density,
+        )
+        with open(
+            os.path.join(os.getcwd(), self.__mass_input_file_path), "w", encoding="utf-8"
+        ) as f:
+            mass_input.to_mass(f)
+        commands = [
+            "OPER",
+            f"A A {alpha}",
+            "X",
+            "C1",
+            f"B {bank_angle}",
+            "",
+            "X",
+            f"FS {self.__result_file_path}",
+            "",
+            "QUIT",
+        ]
+        self.run_avl(commands)
+        with open(os.path.join(os.getcwd(), self.__result_file_path), "r", encoding="utf-8") as f:
+            content = f.read()
+        os.remove(self.__geometry_input_file_path)
+        os.remove(self.__mass_input_file_path)
+        os.remove(self.__result_file_path)
+        table_header = " Strip Forces referred to Strip Area, Chord\n"
+        first_table_start = content.find(table_header) + len(table_header)
+        first_table_end = first_table_start + content[first_table_start:].find("\n\n")
+        second_table_start = (
+            first_table_end + content[first_table_end:].find(table_header) + len(table_header)
+        )
+        second_table_end = second_table_start + content[second_table_start:].find("\n --")
+        df1 = pd.read_fwf(io.StringIO(content[first_table_start:first_table_end])).astype(float)
+        df2 = pd.read_fwf(io.StringIO(content[second_table_start:second_table_end])).astype(float)
+        df = DataFrame[LiftCoefficientDistribution](
+            pd.DataFrame(
+                {
+                    "spanwise_location": pd.concat([df1["Yle"], df2["Yle"]], ignore_index=True),
+                    "lift_coefficient": pd.concat([df1["cl"], df2["cl"]], ignore_index=True),
+                }
+            ).sort_values("spanwise_location")
+        )
+        legend = [
+            f"Airfoil {wing.section_array[0].airfoil.name}",
+            f"S={round(wing.planform_area(), 3)}m²",
+            f"Cmac={round(wing.mean_aerodynamic_chord(), 3)}m",
+            f"B={round(wing.span(), 3)}m",
+            f"α={alpha}°",
+            f"Φ={bank_angle}°",
+        ]
+        if wing.mass_properties.mass > 0:
+            legend.append(f"m={round(wing.mass_properties.mass, 3)}kg")
+        if air_density is not None:
+            legend.append(f"ρ={round(air_density, 3)}kg/m³")
+        if gravitational_acceleration is not None:
+            legend.append(f"g={round(gravitational_acceleration, 3)}m/s²")
+        df.attrs["legend"] = " | ".join(legend)
         return df
