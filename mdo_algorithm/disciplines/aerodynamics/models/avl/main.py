@@ -5,14 +5,23 @@ This module defines data structures for configuring aerodynamic models in AVL.
 It provides classes to represent key AVL input parameters.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntEnum
+from typing import overload, IO
 
 from pandera.typing import DataFrame
+import numpy as np
 
-from mdo_algorithm.disciplines.common.models.geometries import Xyz
-from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
+from mdo_algorithm.disciplines.common.models.geometries import (
+    Xyz,
+    MassProperties,
+)
+from mdo_algorithm.disciplines.aerodynamics.functions import cl_alpha_slope
+from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
+    Airfoil,
+    Wing,
+)
+from mdo_algorithm.disciplines.aerodynamics.models.dataframe import Coefficients
 
 
 class Symmetry(IntEnum):
@@ -679,9 +688,9 @@ class Surface:
 
 
 @dataclass
-class Input:
+class GeometryInput:
     """
-    AVL input configuration.
+    AVL geometry input configuration.
 
     :param header: Header information of the AVL input file.
     :type header: Header
@@ -697,14 +706,261 @@ class Input:
     surface_array: list[Surface]
     body_array: list[Body]
 
-    def to_input_file(self) -> str:
+    @staticmethod
+    def from_wing(
+        wing: Wing,
+        xfoil_coefficients_array: list[DataFrame[Coefficients]] | None = None,
+    ) -> "GeometryInput":
         """
-        Export formatted string for the AVL input file
+        Create AVL geometry input from a Wing object.
+
+        :param wing: Wing object to convert to AVL geometry input.
+        :type wing: Wing
+
+        :param xfoil_coefficients_array: Array of XFOIL coefficients for each section.
+        :type xfoil_coefficients_array: list[DataFrame[Coefficients]] | None
+
+        :return: AVL geometry input corresponding to the wing.
+        :rtype: GeometryInput
         """
-        return "\n".join(
+        if xfoil_coefficients_array is not None and len(wing.section_array) != len(
+            xfoil_coefficients_array
+        ):
+            raise ValueError(
+                "The number of wing sections must be equal to the number of XFOIL coefficients"
+            )
+        return GeometryInput(
+            header=Header(
+                title="Plane",
+                default_mach_number=0,
+                y_symmetry=Symmetry.IGNORE,
+                z_symmetry=Symmetry.IGNORE,
+                xy_plane_location=0,
+                reference_area=round(wing.planform_area(), 3),
+                reference_chord=round(wing.mean_aerodynamic_chord(), 3),
+                reference_span=wing.span(),
+                default_location=Xyz(0.25 * wing.section_array[0].chord, 0, 0),
+                default_profile_drag_coefficient=None,
+            ),
+            surface_array=[
+                Surface(
+                    name="Wing",
+                    chordwise_vortice_count=12,
+                    chordwise_vortex_spacing=1,
+                    spanwise_vortice_count=20,
+                    spanwise_vortex_spacing=-1.5,
+                    mirror_surface=True,
+                    xz_plane_location=0,
+                    scale=None,
+                    translate=None,
+                    incremental_angle=None,
+                    ignore_wake=False,
+                    ignore_freestream_effect=False,
+                    ignore_load_contribution=False,
+                    profile_drag_settings=None,
+                    section_array=[
+                        Section(
+                            location=wing_section.location,
+                            chord=wing_section.chord,
+                            incremental_angle=wing_section.incremental_angle,
+                            spanwise_vortice_count=None,
+                            spanwise_vortex_spacing=None,
+                            airfoil=wing_section.airfoil,
+                            control_array=[],
+                            cl_alpha_slope_scaling=(
+                                round(cl_alpha_slope(xfoil_coefficients_array[i]) / (2 * np.pi), 3)
+                                if xfoil_coefficients_array is not None
+                                else None
+                            ),
+                            profile_drag_settings=(
+                                ProfileDragSettings.from_xfoil_coefficients(
+                                    xfoil_coefficients_array[i]
+                                )
+                                if xfoil_coefficients_array is not None
+                                else None
+                            ),
+                        )
+                        for i, wing_section in enumerate(wing.section_array)
+                    ],
+                )
+            ],
+            body_array=[],
+        )
+
+    @overload
+    def to_avl(self) -> str: ...
+
+    @overload
+    def to_avl(self, file: None) -> str: ...
+
+    @overload
+    def to_avl(self, file: IO[str]) -> None: ...
+
+    def to_avl(self, file: IO[str] | None = None) -> str | None:
+        """
+        Export formatted AVL file
+
+        :param file: File to write the AVL input to.
+        :type file: IO[str] | None
+        """
+        avl = "\n".join(
             [
                 self.header.to_input_file(),
                 "\n".join([surface.to_input_file() for surface in self.surface_array]),
                 "\n".join([body.to_input_file() for body in self.body_array]),
             ]
         )
+        if file is not None:
+            file.write(avl)
+            return None
+        return avl
+
+
+@dataclass
+class MassInput:
+    """
+    Mass input for AVL.
+
+    :param length_unit_meters: Length unit in meters.
+    :type length_unit_meters: float
+
+    :param mass_unit_kilograms: Mass unit in kilograms.
+    :type mass_unit_kilograms: float
+
+    :param time_unit_seconds: Time unit in seconds.
+    :type time_unit_seconds: float
+
+    :param gravitational_acceleration: Gravitational acceleration.
+    :type gravitational_acceleration: float | None
+
+    :param air_density: Air density in kg/m^3.
+    :type air_density: float | None
+
+    :param mass_properties_array: List of mass properties for each component.
+    :type mass_properties_array: list[MassProperties]
+    """
+
+    length_unit_meters: float = 1
+    mass_unit_kilograms: float = 1
+    time_unit_seconds: float = 1
+    gravitational_acceleration: float | None = None
+    air_density: float | None = None
+    mass_properties_array: list[MassProperties] = field(default_factory=list)
+
+    @staticmethod
+    def from_wing(
+        wing: Wing,
+        length_unit_meters: float = 1,
+        mass_unit_kilograms: float = 1,
+        time_unit_seconds: float = 1,
+        gravitational_acceleration: float | None = None,
+        air_density: float | None = None,
+    ) -> "MassInput":
+        """
+        Create mass input from a Wing object.
+
+        :param wing: Wing object to convert to mass input.
+        :type wing: Wing
+
+        :param length_unit_meters: Length unit in meters.
+        :type length_unit_meters: float
+
+        :param mass_unit_kilograms: Mass unit in kilograms.
+        :type mass_unit_kilograms: float
+
+        :param time_unit_seconds: Time unit in seconds.
+        :type time_unit_seconds: float
+
+        :param gravitational_acceleration: Gravitational acceleration.
+        :type gravitational_acceleration: float | None
+
+        :param air_density: Air density in kg/m^3.
+        :type air_density: float | None
+
+        :return: Mass input corresponding to the wing.
+        :rtype: MassInput
+        """
+        return MassInput(
+            length_unit_meters=length_unit_meters,
+            mass_unit_kilograms=mass_unit_kilograms,
+            time_unit_seconds=time_unit_seconds,
+            gravitational_acceleration=gravitational_acceleration,
+            air_density=air_density,
+            mass_properties_array=[wing.mass_properties],
+        )
+
+    @overload
+    def to_mass(self) -> str: ...
+
+    @overload
+    def to_mass(self, file: None) -> str: ...
+
+    @overload
+    def to_mass(self, file: IO[str]) -> None: ...
+
+    def to_mass(self, file: IO[str] | None = None) -> str | None:
+        """
+        Export formatted AVL file
+
+        :param file: File to write the AVL input to.
+        :type file: IO[str] | None
+        """
+        line_array = [
+            "# length unit in meters",
+            f"Lunit = {float(self.length_unit_meters)} m",
+            "",
+            "# mass unit in kilograms",
+            f"Munit = {float(self.mass_unit_kilograms)} kg",
+            "",
+            "# time unit in seconds",
+            f"Tunit = {float(self.time_unit_seconds)} s",
+            "",
+        ]
+        if self.gravitational_acceleration is not None:
+            line_array.extend(
+                [
+                    "# gravitational acceleration",
+                    f"g = {round(self.gravitational_acceleration, 3)}",
+                    "",
+                ]
+            )
+        if self.air_density is not None:
+            line_array.extend(
+                [
+                    "# air density",
+                    f"rho = {round(self.air_density, 3)}",
+                    "",
+                ]
+            )
+        headers = ["# mass", "Xcg", "Ycg", "Zcg", "Ixx", "Iyy", "Izz", "Ixy", "Ixz", "Iyz"]
+        data = [
+            [
+                float(mass.mass),
+                float(mass.center_of_gravity.x),
+                float(mass.center_of_gravity.y),
+                float(mass.center_of_gravity.z),
+                float(mass.moments_of_inertia.x),
+                float(mass.moments_of_inertia.y),
+                float(mass.moments_of_inertia.z),
+                float(mass.products_of_inertia.xy),
+                float(mass.products_of_inertia.xz),
+                float(mass.products_of_inertia.yz),
+            ]
+            for mass in self.mass_properties_array
+        ]
+        col_widths = [max(len(str(item)) for item in col) for col in zip(headers, *data)]
+        col_widths[1:] = [v + 2 for v in col_widths[1:]]
+        line_array.extend(
+            [
+                " ".join([f"{header:>{col_widths[i]}}" for i, header in enumerate(headers)]),
+                *[
+                    " ".join([f"{str(item):>{col_widths[i]}}" for i, item in enumerate(row)])
+                    for row in data
+                ],
+            ]
+        )
+        output = "\n".join(line_array)
+        if file is not None:
+            file.write(output)
+            return None
+        return output
