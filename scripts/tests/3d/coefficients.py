@@ -14,7 +14,7 @@ from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     SurfaceSection,
     Wing,
 )
-from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.dataframe import Coefficients
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService
 from mdo_algorithm.disciplines.aerodynamics.services.avl import AvlService
 from mdo_algorithm.disciplines.aerodynamics.functions import plot_coefficients
@@ -46,7 +46,7 @@ def main():
             section.airfoil,
             **{
                 "alpha": alpha,
-                "reynolds": reynolds_number(12, section.chord, 660, 20),
+                "reynolds": reynolds_number(15, section.chord, 660, 20),
                 "iterations": 1000,
             },
         )
