@@ -8,7 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import linregress
 
-from mdo_algorithm.disciplines.aerodynamics.models.data import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.dataframe import (
+    Coefficients,
+    LiftCoefficientDistribution,
+)
 
 
 def cl_alpha_slope(xfoil_coefficients: DataFrame[Coefficients]) -> float:
