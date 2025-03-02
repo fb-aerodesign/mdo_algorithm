@@ -13,3 +13,7 @@ Para instalar as bibliotecas necessárias, execute o seguinte comando:
 ```bash
 pip install -r requirements.txt
 ```
+
+## Documentação
+
+A documentação geral do módulo `mdo_algorithm` pode ser encontrada [aqui](mdo_algorithm/docs/mdo_algorithm.md).
