@@ -229,7 +229,7 @@ def chord_distribution(self, y: float) -> float:
 Possui o método `planform_area` para obter a área da forma em planta da asa em $ \text{m}^{2} $. A área é obtida calculando o dobro da integral da corda ao longo da meia envergadura, utilizando a equação:
 
 $$
-S = 2 \int_{0}^{y_{\text{máx}}} c(y) \, dy
+S = 2 \int_{0}^{y_{\text{máx}}} c(y) \ dy
 $$
 
 O cálculo da integral é feito utilizando a função `quad` do módulo `scipy.integrate`.
