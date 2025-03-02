@@ -32,7 +32,7 @@ Funções utilitárias para cálculos aerodinâmicos.
 
 Calcula a inclinação em $\text{rad}^{-1}$ da curva de coeficiente de sustentação em relação ao ângulo de ataque.
 
-Para isso, recebe o argumento `coefficients`, um DataFrame com os coeficientes de sustentação e ângulos de ataque em graus.
+Para isso, recebe o argumento `coefficients`, um [DataFrame](#11421-coefficients) com os coeficientes de sustentação e ângulos de ataque em graus.
 
 ```python
 def lift_coefficient_slope(coefficients: DataFrame[Coefficients]) -> float: ...
@@ -121,7 +121,7 @@ Essa configuração corresponde ao parâmetro CDCL do [AVL](https://web.mit.edu/
 - CL2 CD2: região principal da polar.
 - CL3 CD3: para alto CL.
 
-O método `from_xfoil_coefficients` permite criar uma instância a partir de coeficientes obtidos no [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/) de forma automática. Para isso, é necessário fornecer um DataFrame com os coeficientes de sustentação e arrasto em um intervalo apropriado de ângulo de ataque, recomendado em torno de 0° a 20° com incremento de 0,5°.
+O método `from_xfoil_coefficients` permite criar uma instância a partir de coeficientes obtidos no [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/) de forma automática. Para isso, é necessário fornecer um [DataFrame](#11421-coefficients) com os coeficientes de sustentação e arrasto em um intervalo apropriado de ângulo de ataque, recomendado em torno de 0° a 20° com incremento de 0,5°.
 
 ##### 1.1.4.1.5. `Control`
 
