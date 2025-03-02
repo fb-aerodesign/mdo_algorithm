@@ -14,24 +14,21 @@ from mdo_algorithm.disciplines.aerodynamics.models.dataframe import (
 )
 
 
-def cl_alpha_slope(xfoil_coefficients: DataFrame[Coefficients]) -> float:
+def lift_coefficient_slope(coefficients: DataFrame[Coefficients]) -> float:
     """
     Calculate the lift coefficient slope
 
-    :param xfoil_coefficients: XFOIL coefficients
-    :type xfoil_coefficients: DataFrame[Coefficients]
+    :param coefficients: Aerodynamic coefficients
+    :type coefficients: DataFrame[Coefficients]
 
     :return: Lift coefficient slope
     :rtype: float
     """
 
-    mask = (xfoil_coefficients["alpha"] > 0) & (xfoil_coefficients["alpha"] < 5)
-    alpha = xfoil_coefficients.loc[mask, "alpha"] * np.pi / 180
-    cl = xfoil_coefficients.loc[mask, "lift_coefficient"]
-
-    res = linregress(alpha, cl)
-
-    return res.slope
+    mask = (coefficients["alpha"] > 0) & (coefficients["alpha"] < 5)
+    alpha = coefficients.loc[mask, "alpha"] * np.pi / 180
+    cl = coefficients.loc[mask, "lift_coefficient"]
+    return linregress(alpha, cl).slope
 
 
 def plot_coefficients(coefficients_array: list[DataFrame[Coefficients]]) -> None:
