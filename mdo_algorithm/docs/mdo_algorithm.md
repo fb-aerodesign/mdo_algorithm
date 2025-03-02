@@ -1,10 +1,10 @@
 # Módulo `mdo_algorithm`
 
-## 1. `disciplines`
+# 1. `disciplines`
 
 Disciplinas de projeto de aeronaves, cada uma responsável por modelar e simular um aspecto específico do projeto. As disciplinas disponíveis são:
 
-### 1.1. `aerodynamics`
+## 1.1. `aerodynamics`
 
 Ferramentas para modelar e simular o comportamento aerodinâmico de uma aeronave.
 
@@ -28,7 +28,7 @@ Valores constantes utilizados nas simulações aerodinâmicas. Esses valores sã
 
 Funções utilitárias para cálculos aerodinâmicos.
 
-### 1.1.3.1. `lift_coefficient_slope`
+#### 1.1.3.1. `lift_coefficient_slope`
 
 Calcula a inclinação em $\text{rad}^{-1}$ da curva de coeficiente de sustentação em relação ao ângulo de ataque.
 
@@ -66,15 +66,15 @@ Utiliza-se a função `linregress` do módulo `scipy.stats`.
 return linregress(alpha, cl).slope
 ```
 
-### 1.1.3.2 `plot_coefficients`
+#### 1.1.3.2 `plot_coefficients`
 
 Plota os coeficientes de sustentação e arrasto em função do ângulo de ataque.
 
-### 1.1.3.3 `plot_drag_polar`
+#### 1.1.3.3 `plot_drag_polar`
 
 Plota o coeficiente de arrasto em função do coeficiente de sustentação.
 
-### 1.1.3.4 `plot_lift_distribution`
+#### 1.1.3.4 `plot_lift_distribution`
 
 Plota o coeficiente de sustentação ao longo da envergadura.
 
@@ -82,13 +82,13 @@ Plota o coeficiente de sustentação ao longo da envergadura.
 
 Classes para modelagem de dados de aerodinâmica.
 
-### 1.1.4.1. `avl`
+#### 1.1.4.1. `avl`
 
 [mdo_algorithm.disciplines.aerodynamics.models.avl](../disciplines/aerodynamics/models/avl/main.py)
 
 Modelos de dados para análises aerodinâmicas com o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.1.1. `Symmetry`
+##### 1.1.4.1.1. `Symmetry`
 
 Classe Enum que define uma condição de simetria. Corresponde aos parâmetros iYsym e iZsym do [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
@@ -96,20 +96,20 @@ Classe Enum que define uma condição de simetria. Corresponde aos parâmetros i
 - `ANTISYMMETRIC`: anti-simétrico com relação ao plano de referência (-1 no [AVL](https://web.mit.edu/drela/Public/web/avl/)).
 - `IGNORE`: ignorar a simetria (0 no [AVL](https://web.mit.edu/drela/Public/web/avl/)).
 
-### 1.1.4.1.2. `Deflection`
+##### 1.1.4.1.2. `Deflection`
 
 Classe Enum que define um tipo de deflexão para superfícies espelhadas. Corresponde ao parâmetro SgnDup do [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 - `NORMAL`: deflexão normal (1 no [AVL](https://web.mit.edu/drela/Public/web/avl/)).
 - `INVERSE`: deflexão invertida (-1 no [AVL](https://web.mit.edu/drela/Public/web/avl/)).
 
-### 1.1.4.1.2. `Header`
+##### 1.1.4.1.2. `Header`
 
 Classe para representar o cabeçalho de um arquivo de entrada de geometria do [AVL](https://web.mit.edu/drela/Public/web/avl/). Descreve os valores padrão para coordenadas, simetria e dimensões de referência.
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.1.3. `ProfileDragSettings`
+##### 1.1.4.1.3. `ProfileDragSettings`
 
 Classe para representar as configurações de arrasto parasita de um perfil aerodinâmico.
 
@@ -123,31 +123,31 @@ Essa configuração corresponde ao parâmetro CDCL do [AVL](https://web.mit.edu/
 
 O método `from_xfoil_coefficients` permite criar uma instância a partir de coeficientes obtidos no [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/) de forma automática. Para isso, é necessário fornecer um DataFrame com os coeficientes de sustentação e arrasto em um intervalo apropriado de ângulo de ataque, recomendado em torno de 0° a 20° com incremento de 0,5°.
 
-### 1.1.4.1.4. `Control`
+##### 1.1.4.1.4. `Control`
 
 Classe para representar uma superfície de controle no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.1.5. `Section`
+##### 1.1.4.1.5. `Section`
 
 Classe para representar uma seção de superfície sustentadora no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.1.6. `Body`
+##### 1.1.4.1.6. `Body`
 
 Classe para representar uma fuselagem ou um corpo não sustentador no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.1.7. `Surface`
+##### 1.1.4.1.7. `Surface`
 
 Classe para representar uma superfície sustentadora no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.1.8. `GeometryInput`
+##### 1.1.4.1.8. `GeometryInput`
 
 Classe para representar um arquivo de entrada de geometria do [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
@@ -155,7 +155,7 @@ Possui o método `from_wing` para criar uma instância automaticamente a partir 
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.1.9. `MassInput`
+##### 1.1.4.1.9. `MassInput`
 
 Classe para representar um arquivo de entrada de massa do [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
@@ -163,13 +163,13 @@ Possui o método `from_wing` para criar uma instância automaticamente a partir 
 
 Possui o método `to_mass` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 1.1.4.2. `dataframe`
+#### 1.1.4.2. `dataframe`
 
 [mdo_algorithm.disciplines.aerodynamics.models.dataframe](../disciplines/aerodynamics/models/dataframe/main.py)
 
 Modelos de dados para análises aerodinâmicas com DataFrames.
 
-### 1.1.4.2.1. `Coefficients`
+##### 1.1.4.2.1. `Coefficients`
 
 DataFrame para armazenar coeficientes de sustentação e arrasto em função do ângulo de ataque.
 
@@ -180,7 +180,7 @@ DataFrame para armazenar coeficientes de sustentação e arrasto em função do 
 | `drag_coefficient` | `float` | Coeficiente de arrasto. |
 | `moment_coefficient` | `float` | Coeficiente de momento. |
 
-### 1.1.4.2.2. `LiftCoefficientDistribution`
+##### 1.1.4.2.2. `LiftCoefficientDistribution`
 
 DataFrame para armazenar distribuição do coeficiente de sustentação ao longo da envergadura.
 
@@ -189,23 +189,23 @@ DataFrame para armazenar distribuição do coeficiente de sustentação ao longo
 | `spanwise_location` | `float` | Localização ao longo da envergadura. |
 | `lift_coefficient` | `float` | Coeficiente de sustentação. |
 
-### 1.1.4.3. `geometries`
+#### 1.1.4.3. `geometries`
 
 [mdo_algorithm.disciplines.aerodynamics.models.geometries](../disciplines/aerodynamics/models/geometries/main.py)
 
 Modelos de dados para geometrias de aerodinâmica.
 
-### 1.1.4.3.1. `Airfoil`
+##### 1.1.4.3.1. `Airfoil`
 
 Classe para representar um perfil aerodinâmico.
 
 Possui o método `relative_path` para obter o caminho relativo do arquivo do perfil.
 
-### 1.1.4.3.2. `SurfaceSection`
+##### 1.1.4.3.2. `SurfaceSection`
 
 Classe para representar uma seção de superfície sustentadora.
 
-### 1.1.4.3.3. `Wing`
+##### 1.1.4.3.3. `Wing`
 
 Classe para representar uma asa.
 
@@ -260,11 +260,11 @@ def mean_aerodynamic_chord(self) -> float:
 
 Classes para interagir com softwares de simulação e análise aerodinâmica.
 
-### 1.1.5.1. `avl`
+#### 1.1.5.1. `avl`
 
 [mdo_algorithm.disciplines.aerodynamics.services.avl](../disciplines/aerodynamics/services/avl/main.py)
 
-### 1.1.5.1.1. `AvlService`
+##### 1.1.5.1.1. `AvlService`
 
 Classe para interagir com o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
@@ -274,11 +274,11 @@ Possui o método `get_wing_coefficients` para executar uma série de comandos no
 
 Possui o método `get_wing_lift_coefficient_distribution` para executar uma série de comandos no [AVL](https://web.mit.edu/drela/Public/web/avl/) e obter a distribuição do coeficiente de sustentação a partir de um objeto [`Wing`](#11433-wing).
 
-### 1.1.5.2. `xfoil`
+#### 1.1.5.2. `xfoil`
 
 [mdo_algorithm.disciplines.aerodynamics.services.xfoil](../disciplines/aerodynamics/services/xfoil/main.py)
 
-### 1.1.5.2.1. `XfoilService`
+##### 1.1.5.2.1. `XfoilService`
 
 Classe para interagir com o [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/).
 
@@ -286,7 +286,7 @@ Possui o método `run_xfoil` para executar o [XFOIL](https://web.mit.edu/drela/P
 
 Possui o método `get_coefficients` para executar uma série de comandos no [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/) e obter os coeficientes aerodinâmicos a partir de um objeto [`Airfoil`](#11431-airfoil).
 
-### 1.2. `common`
+## 1.2. `common`
 
 Classes e funções comuns a diversas disciplinas.
 
@@ -296,35 +296,35 @@ Classes e funções comuns a diversas disciplinas.
 
 Valores constantes utilizados nas disciplinas. Esses valores são:
 
-### 1.2.1.1. `SEA_LEVEL_TEMPERATURE`
+#### 1.2.1.1. `SEA_LEVEL_TEMPERATURE`
 
 temperatura ao nível do mar em $ \text{K} $ = $ 288.15 \text{K} $
 
-### 1.2.1.2. `SEA_LEVEL_PRESSURE`
+#### 1.2.1.2. `SEA_LEVEL_PRESSURE`
 
 pressão ao nível do mar em $ \text{Pa} $ = $ 101325 \text{Pa} $
 
-### 1.2.1.3. `TEMPERATURE_LAPSE_RATE`
+#### 1.2.1.3. `TEMPERATURE_LAPSE_RATE`
 
 taxa de variação da temperatura com a altitude em $ \frac{\text{K}}{\text{m}} $ = $ 0.0065 \frac{\text{K}}{\text{m}} $
 
-### 1.2.1.4. `MOLAR_GAS_CONSTANT`
+#### 1.2.1.4. `MOLAR_GAS_CONSTANT`
 
 constante universal dos gases em $ \frac{\text{J}}{\text{mol} \cdot \text{K}} $ = $ 8.3145 \frac{\text{J}}{\text{mol} \cdot \text{K}} $
 
-### 1.2.1.5. `MOLAR_MASS_FOR_DRY_AIR`
+#### 1.2.1.5. `MOLAR_MASS_FOR_DRY_AIR`
 
 massa molar do ar seco em $ \frac{\text{kg}}{\text{mol}} $ = $ 0.028966 \frac{\text{kg}}{\text{mol}} $
 
-### 1.2.1.6. `GRAVITATIONAL_ACCELERATION`
+#### 1.2.1.6. `GRAVITATIONAL_ACCELERATION`
 
 aceleração gravitacional em $ \frac{\text{m}}{\text{s}^{2}} $ = $ 9.80665 \frac{\text{m}}{\text{s}^{2}} $
 
-### 1.2.1.7. `SEA_LEVEL_AIR_DYNAMIC_VISCOSITY`
+#### 1.2.1.7. `SEA_LEVEL_AIR_DYNAMIC_VISCOSITY`
 
 viscosidade dinâmica do ar ao nível do mar em $ \text{Pa} \cdot \text{s} $ = $ 1.716 \cdot 10^{-5} \text{Pa} \cdot \text{s} $
 
-### 1.2.1.8. `SUTHERLAND_CONSTANT`
+#### 1.2.1.8. `SUTHERLAND_CONSTANT`
 
 constante de Sutherland em $ \text{K} $ = $ 110.4 \text{K} $
 
@@ -334,7 +334,7 @@ constante de Sutherland em $ \text{K} $ = $ 110.4 \text{K} $
 
 Funções utilitárias comuns a diversas disciplinas.
 
-### 1.2.2.1. `air_density`
+#### 1.2.2.1. `air_density`
 
 Calcula a densidade do ar em função da altitude.
 
@@ -385,7 +385,7 @@ Onde:
 - $ P_{0} $ é a [pressão ao nível do mar](#1212-sea_level_pressure) em $ \text{Pa} $
 - $ g $ é a [aceleração gravitacional](#1216-gravitational_acceleration) em $ \frac{\text{m}}{\text{s}^{2}} $
 
-### 1.2.2.2. `air_viscosity`
+#### 1.2.2.2. `air_viscosity`
 
 Calcula a viscosidade dinâmica do ar em função da temperatura.
 
@@ -403,7 +403,7 @@ Onde:
 - $ T_{0} $ é a [temperatura ao nível do mar](#1211-sea_level_temperature) em $ \text{K} $
 - $ S $ é a [constante de Sutherland](#1218-sutherland_constant) em $ \text{K} $
 
-### 1.2.2.3. `reynolds_number`
+#### 1.2.2.3. `reynolds_number`
 
 Calcula o número de Reynolds em função da velocidade, corda e viscosidade dinâmica.
 
@@ -425,32 +425,32 @@ Onde:
 
 Classes para modelagem de dados comuns a diversas disciplinas.
 
-### 1.2.3.1. `geometries`
+#### 1.2.3.1. `geometries`
 
 [mdo_algorithm.disciplines.common.models.geometries](../disciplines/common/models/geometries/main.py)
 
 Modelos de dados para geometrias comuns a diversas disciplinas.
 
-### 1.2.3.1.1. `Point`
+##### 1.2.3.1.1. `Point`
 
 Classe para representar um ponto no espaço.
 
-### 1.2.3.1.2. `ProductsOfInertia`
+##### 1.2.3.1.2. `ProductsOfInertia`
 
 Classe para representar os produtos de inércia de um corpo.
 
-### 1.2.3.1.3. `MassProperties`
+##### 1.2.3.1.3. `MassProperties`
 
 Classe para representar as propriedades de massa de um corpo.
 
-### 2. `softwares`
+# 2. `softwares`
 
 Softwares de simulação e análise.
 
-### 2.1. `avl`
+## 2.1. `avl`
 
 Software de análise aerodinâmica [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-### 2.2. `xfoil`
+## 2.2. `xfoil`
 
 Software de análise de perfis aerodinâmicos [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/).
