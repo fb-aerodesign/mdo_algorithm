@@ -6,9 +6,9 @@ from dataclasses import dataclass, field
 
 
 @dataclass
-class Xyz:
+class Point:
     """
-    Three-dimensional object
+    Three-dimensional point
     """
 
     x: float = 0
@@ -34,6 +34,6 @@ class MassProperties:
     """
 
     mass: float = 0
-    center_of_gravity: Xyz = field(default_factory=Xyz)
-    moments_of_inertia: Xyz = field(default_factory=Xyz)
+    center_of_gravity: Point = field(default_factory=Point)
+    moments_of_inertia: Point = field(default_factory=Point)
     products_of_inertia: ProductsOfInertia = field(default_factory=ProductsOfInertia)
