@@ -331,6 +331,7 @@ $$
 #### 1.2.1.5. `MOLAR_MASS_FOR_DRY_AIR`
 
 Massa molar do ar seco.
+
 $$
 0.028966 \ \frac{\text{kg}}{\text{mol}}
 $$
@@ -338,6 +339,7 @@ $$
 #### 1.2.1.6. `GRAVITATIONAL_ACCELERATION`
 
 Aceleração gravitacional.
+
 $$
 9.80665 \ \frac{\text{m}}{\text{s}^{2}}
 $$
