@@ -13,7 +13,7 @@ from mdo_algorithm.disciplines.common.functions import (
     air_density,
 )
 from mdo_algorithm.disciplines.common.models.geometries import (
-    Xyz,
+    Point,
     MassProperties,
 )
 
@@ -42,16 +42,16 @@ def main():
     wing = Wing(
         section_array=[
             SurfaceSection(
-                location=Xyz(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
+                location=Point(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
             ),
             SurfaceSection(
-                location=Xyz(0.15, 1.15, 0),
+                location=Point(0.15, 1.15, 0),
                 chord=0.3,
                 incremental_angle=0,
                 airfoil=Airfoil("s1223"),
             ),
         ],
-        mass_properties=MassProperties(mass=10, center_of_gravity=Xyz(0.15, 0, 0)),
+        mass_properties=MassProperties(mass=10, center_of_gravity=Point(0.15, 0, 0)),
     )
 
     alpha = (-5, 20, 0.5)

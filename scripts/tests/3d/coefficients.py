@@ -7,7 +7,7 @@ from pandera.typing import DataFrame
 from mdo_algorithm.disciplines.common.functions import (
     reynolds_number,
 )
-from mdo_algorithm.disciplines.common.models.geometries import Xyz
+from mdo_algorithm.disciplines.common.models.geometries import Point
 
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     Airfoil,
@@ -27,10 +27,10 @@ def main():
     wing = Wing(
         section_array=[
             SurfaceSection(
-                location=Xyz(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
+                location=Point(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
             ),
             SurfaceSection(
-                location=Xyz(0.15, 1.15, 0),
+                location=Point(0.15, 1.15, 0),
                 chord=0.3,
                 incremental_angle=0,
                 airfoil=Airfoil("s1223"),
