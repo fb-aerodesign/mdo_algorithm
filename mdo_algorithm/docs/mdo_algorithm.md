@@ -103,13 +103,13 @@ Classe Enum que define um tipo de deflexão para superfícies espelhadas. Corres
 - `NORMAL`: deflexão normal (1 no [AVL](https://web.mit.edu/drela/Public/web/avl/)).
 - `INVERSE`: deflexão invertida (-1 no [AVL](https://web.mit.edu/drela/Public/web/avl/)).
 
-##### 1.1.4.1.2. `Header`
+##### 1.1.4.1.3. `Header`
 
 Classe para representar o cabeçalho de um arquivo de entrada de geometria do [AVL](https://web.mit.edu/drela/Public/web/avl/). Descreve os valores padrão para coordenadas, simetria e dimensões de referência.
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-##### 1.1.4.1.3. `ProfileDragSettings`
+##### 1.1.4.1.4. `ProfileDragSettings`
 
 Classe para representar as configurações de arrasto parasita de um perfil aerodinâmico.
 
@@ -123,31 +123,31 @@ Essa configuração corresponde ao parâmetro CDCL do [AVL](https://web.mit.edu/
 
 O método `from_xfoil_coefficients` permite criar uma instância a partir de coeficientes obtidos no [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/) de forma automática. Para isso, é necessário fornecer um DataFrame com os coeficientes de sustentação e arrasto em um intervalo apropriado de ângulo de ataque, recomendado em torno de 0° a 20° com incremento de 0,5°.
 
-##### 1.1.4.1.4. `Control`
+##### 1.1.4.1.5. `Control`
 
 Classe para representar uma superfície de controle no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-##### 1.1.4.1.5. `Section`
+##### 1.1.4.1.6. `Section`
 
 Classe para representar uma seção de superfície sustentadora no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-##### 1.1.4.1.6. `Body`
+##### 1.1.4.1.7. `Body`
 
 Classe para representar uma fuselagem ou um corpo não sustentador no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-##### 1.1.4.1.7. `Surface`
+##### 1.1.4.1.8. `Surface`
 
 Classe para representar uma superfície sustentadora no [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-##### 1.1.4.1.8. `GeometryInput`
+##### 1.1.4.1.9. `GeometryInput`
 
 Classe para representar um arquivo de entrada de geometria do [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
@@ -155,7 +155,7 @@ Possui o método `from_wing` para criar uma instância automaticamente a partir 
 
 Possui o método `to_avl` para converter os valores em uma string formatada para o [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
-##### 1.1.4.1.9. `MassInput`
+##### 1.1.4.1.10. `MassInput`
 
 Classe para representar um arquivo de entrada de massa do [AVL](https://web.mit.edu/drela/Public/web/avl/).
 
