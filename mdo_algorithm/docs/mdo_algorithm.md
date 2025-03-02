@@ -2,7 +2,7 @@
 
 # 1. `disciplines`
 
-Disciplinas de projeto de aeronaves, cada uma responsável por modelar e simular um aspecto específico do projeto. As disciplinas disponíveis são:
+Disciplinas de projeto de aeronaves, cada uma responsável por modelar e simular um aspecto específico do projeto.
 
 ## 1.1. `aerodynamics`
 
