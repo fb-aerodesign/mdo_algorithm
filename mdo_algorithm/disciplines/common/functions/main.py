@@ -9,8 +9,8 @@ from mdo_algorithm.disciplines.common.constants import (
     MOLAR_GAS_CONSTANT,
     MOLAR_MASS_FOR_DRY_AIR,
     GRAVITATIONAL_ACCELERATION,
+    SEA_LEVEL_AIR_DYNAMIC_VISCOSITY,
     SUTHERLAND_CONSTANT,
-    SUTHERLAND_TEMPERATURE_CONSTANT,
 )
 
 
@@ -23,6 +23,8 @@ def air_density(altitude: float) -> float:
 
     :return: Air density in kg/m^3.
     :rtype: float
+
+    :raises ValueError: If temperature at altitude is below absolute zero.
     """
     h = altitude
     t0 = SEA_LEVEL_TEMPERATURE
@@ -34,6 +36,8 @@ def air_density(altitude: float) -> float:
 
     r = r0 / m0
     t = t0 - l * h
+    if t <= 0:
+        raise ValueError("Temperature at altitude is below absolute zero.")
     p = p0 * (1 - l * h / t0) ** (g / (r * l))
     rho = p / (r * t)
     return rho
@@ -50,10 +54,11 @@ def air_viscosity(temperature: float) -> float:
     :rtype: float
     """
     t = temperature + 273.15
-    c1 = SUTHERLAND_CONSTANT
-    s = SUTHERLAND_TEMPERATURE_CONSTANT
+    t0 = SEA_LEVEL_TEMPERATURE
+    mu0 = SEA_LEVEL_AIR_DYNAMIC_VISCOSITY
+    s = SUTHERLAND_CONSTANT
 
-    mu = c1 * t**1.5 / (t + s)
+    mu = mu0 * (t / t0)**1.5 * (t0 + s) / (t + s)
     return mu
 
 
