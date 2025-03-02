@@ -242,7 +242,7 @@ def planform_area(self) -> float:
 Possui o método `mean_aerodynamic_chord` para obter a corda aerodinâmica média da asa em metros. A corda é obtida calculando uma integral descrita na equação:
 
 $$
-C_{MAC} = \frac{2}{S} \int_{0}^{y_{\text{máx}}} c(y)^{2} \, dy
+C_{MAC} = \frac{2}{S} \int_{0}^{y_{\text{máx}}} c(y)^{2} \ dy
 $$
 
 ```python
