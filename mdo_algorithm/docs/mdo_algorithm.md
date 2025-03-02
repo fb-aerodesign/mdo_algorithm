@@ -173,21 +173,21 @@ Modelos de dados para análises aerodinâmicas com DataFrames.
 
 DataFrame para armazenar coeficientes de sustentação e arrasto em função do ângulo de ataque.
 
-| Coluna | Tipo | Descrição |
-| --- | --- | --- |
-| `alpha` | `float` | Ângulo de ataque em graus. |
-| `lift_coefficient` | `float` | Coeficiente de sustentação. |
-| `drag_coefficient` | `float` | Coeficiente de arrasto. |
-| `moment_coefficient` | `float` | Coeficiente de momento. |
+| Coluna               | Tipo    | Descrição                   |
+| -------------------- | ------- | --------------------------- |
+| `alpha`              | `float` | Ângulo de ataque em graus.  |
+| `lift_coefficient`   | `float` | Coeficiente de sustentação. |
+| `drag_coefficient`   | `float` | Coeficiente de arrasto.     |
+| `moment_coefficient` | `float` | Coeficiente de momento.     |
 
 ##### 1.1.4.2.2. `LiftCoefficientDistribution`
 
 DataFrame para armazenar distribuição do coeficiente de sustentação ao longo da envergadura.
 
-| Coluna | Tipo | Descrição |
-| --- | --- | --- |
+| Coluna              | Tipo    | Descrição                            |
+| ------------------- | ------- | ------------------------------------ |
 | `spanwise_location` | `float` | Localização ao longo da envergadura. |
-| `lift_coefficient` | `float` | Coeficiente de sustentação. |
+| `lift_coefficient`  | `float` | Coeficiente de sustentação.          |
 
 #### 1.1.4.3. `geometries`
 
