@@ -13,7 +13,7 @@ import numpy as np
 from scipy.integrate import quad
 
 from mdo_algorithm.disciplines.common.models.geometries import (
-    Xyz,
+    Point,
     MassProperties,
 )
 from mdo_algorithm.disciplines.aerodynamics.constants import AIRFOILS_PATH
@@ -43,7 +43,7 @@ class SurfaceSection:
     Represents a section of the lifting surface.
 
     :param leading_edge_location: Location of the airfoil's leading edge
-    :type leading_edge_location: Xyz
+    :type leading_edge_location: Point
 
     :param chord: Local aerodynamic chord length.
     :type chord: float
@@ -55,7 +55,7 @@ class SurfaceSection:
     :type airfoil: Airfoil
     """
 
-    location: Xyz
+    location: Point
     chord: float
     incremental_angle: float
     airfoil: Airfoil
@@ -80,20 +80,6 @@ class Wing:
         """
         return 2 * max(s.location.y for s in self.section_array)
 
-    def planform_area(self) -> float:
-        """
-        Compute the wing planform area.
-
-        :return: Planform area in square meters.
-        :rtype: float
-        """
-        sections = sorted(self.section_array, key=lambda x: x.location.y)
-        return 2 * float(
-            np.trapezoid(
-                np.array([s.chord for s in sections]), np.array([s.location.y for s in sections])
-            )
-        )
-
     def chord_distribution(self, y: float) -> float:
         """
         Interpolate chord length at given y position.
@@ -105,13 +91,22 @@ class Wing:
         :rtype: float
         """
         sections = sorted(self.section_array, key=lambda x: x.location.y)
-        ys = np.array([s.location.y for s in sections])
-        chords = np.array([s.chord for s in sections])
-        return np.interp(y, ys, chords)
+        return np.interp(
+            y, np.array([s.location.y for s in sections]), np.array([s.chord for s in sections])
+        )
+
+    def planform_area(self) -> float:
+        """
+        Compute the wing planform area.
+
+        :return: Planform area in square meters.
+        :rtype: float
+        """
+        return 2 * quad(self.chord_distribution, 0, self.span() / 2)[0]
 
     def mean_aerodynamic_chord(self) -> float:
         """
-        Calculate the mean aerodynamic chord using integration.
+        Calculate the mean aerodynamic chord.
 
         :return: Mean aerodynamic chord in meters.
         :rtype: float
