@@ -209,7 +209,7 @@ Classe para representar uma seção de superfície sustentadora.
 
 Classe para representar uma asa.
 
-Possui o método `span` para obter a envergadura da asa em $ \text{m} $. Para isso, é obtido o dobro da localização da seção mais externa da asa.
+Possui o método `span` para obter a envergadura da asa em metros. Para isso, é obtido o dobro da localização da seção mais externa da asa.
 
 ```python
 def span(self) -> float:
@@ -226,7 +226,7 @@ def chord_distribution(self, y: float) -> float:
     )
 ```
 
-Possui o método `planform_area` para obter a área da forma em planta da asa em $ \text{m}^{2} $. A área é obtida calculando o dobro da integral da corda ao longo da meia envergadura, utilizando a equação:
+Possui o método `planform_area` para obter a área da forma em planta da asa em m². A área é obtida calculando o dobro da integral da corda ao longo da meia envergadura, utilizando a equação:
 
 $$
 S = 2 \int_{0}^{y_{\text{máx}}} c(y) \ dy
@@ -239,7 +239,7 @@ def planform_area(self) -> float:
     return 2 * quad(self.chord_distribution, 0, self.span() / 2)[0]
 ```
 
-Possui o método `mean_aerodynamic_chord` para obter a corda aerodinâmica média $ C_{MAC} $ da asa em $ \text{m} $. A corda é obtida calculando uma integral descrita na equação:
+Possui o método `mean_aerodynamic_chord` para obter a corda aerodinâmica média da asa em metros. A corda é obtida calculando uma integral descrita na equação:
 
 $$
 C_{MAC} = \frac{2}{S} \int_{0}^{y_{\text{máx}}} c(y)^{2} \, dy
@@ -298,35 +298,65 @@ Valores constantes utilizados nas disciplinas. Esses valores são:
 
 #### 1.2.1.1. `SEA_LEVEL_TEMPERATURE`
 
-temperatura ao nível do mar em $ \text{K} $ = $ 288.15 \text{K} $
+Temperatura ao nível do mar.
+
+$$
+288.15 \ \text{K}
+$$
 
 #### 1.2.1.2. `SEA_LEVEL_PRESSURE`
 
-pressão ao nível do mar em $ \text{Pa} $ = $ 101325 \text{Pa} $
+Pressão ao nível do mar.
+
+$$
+101325 \ \text{Pa}
+$$
 
 #### 1.2.1.3. `TEMPERATURE_LAPSE_RATE`
 
-taxa de variação da temperatura com a altitude em $ \frac{\text{K}}{\text{m}} $ = $ 0.0065 \frac{\text{K}}{\text{m}} $
+Taxa de variação da temperatura com a altitude.
+
+$$
+0.0065 \ \frac{\text{K}}{\text{m}}
+$$
 
 #### 1.2.1.4. `MOLAR_GAS_CONSTANT`
 
-constante universal dos gases em $ \frac{\text{J}}{\text{mol} \cdot \text{K}} $ = $ 8.3145 \frac{\text{J}}{\text{mol} \cdot \text{K}} $
+Constante universal dos gases.
+
+$$
+8.3145 \ \frac{\text{J}}{\text{mol} \cdot \text{K}}
+$$
 
 #### 1.2.1.5. `MOLAR_MASS_FOR_DRY_AIR`
 
-massa molar do ar seco em $ \frac{\text{kg}}{\text{mol}} $ = $ 0.028966 \frac{\text{kg}}{\text{mol}} $
+Massa molar do ar seco.
+$$
+0.028966 \ \frac{\text{kg}}{\text{mol}}
+$$
 
 #### 1.2.1.6. `GRAVITATIONAL_ACCELERATION`
 
-aceleração gravitacional em $ \frac{\text{m}}{\text{s}^{2}} $ = $ 9.80665 \frac{\text{m}}{\text{s}^{2}} $
+Aceleração gravitacional.
+$$
+9.80665 \ \frac{\text{m}}{\text{s}^{2}}
+$$
 
 #### 1.2.1.7. `SEA_LEVEL_AIR_DYNAMIC_VISCOSITY`
 
-viscosidade dinâmica do ar ao nível do mar em $ \text{Pa} \cdot \text{s} $ = $ 1.716 \cdot 10^{-5} \text{Pa} \cdot \text{s} $
+Viscosidade dinâmica do ar ao nível do mar.
+
+$$
+1.716 \cdot 10^{-5} \ \text{Pa} \cdot \text{s}
+$$
 
 #### 1.2.1.8. `SUTHERLAND_CONSTANT`
 
-constante de Sutherland em $ \text{K} $ = $ 110.4 \text{K} $
+Constante de Sutherland.
+
+$$
+110.4 \ \text{K}
+$$
 
 ### 1.2.2. `functions`
 
@@ -346,10 +376,21 @@ $$
 
 Onde:
 
-- $ \rho $ é a densidade do ar em $ \frac{\text{kg}}{\text{m}^{3}} $
-- $ P $ é a pressão atmosférica local em $ \text{Pa} $
-- $ R_{\text{ar}} $ é a constante específica do ar seco em $ \frac{\text{J}}{\text{mol} \cdot \text{K}} $
-- $ T $ é a temperatura em $ \text{K} $
+$$
+\rho \text{ é a densidade do ar em } \frac{\text{kg}}{\text{m}^{3}}
+$$
+
+$$
+P \text{ é a pressão atmosférica local em } \text{Pa}
+$$
+
+$$
+R_{\text{ar}} \text{ é a constante específica do ar seco em } \frac{\text{J}}{\text{mol} \cdot \text{K}}
+$$
+
+$$
+T \text{ é a temperatura em } \text{K}
+$$
 
 A constante específica do ar seco é calculada utilizando a equação:
 
@@ -359,8 +400,13 @@ $$
 
 Onde:
 
-- $ R $ é a [constante universal dos gases](#1214-molar_gas_constant) em $ \frac{\text{J}}{\text{mol} \cdot \text{K}} $
-- $ M_{\text{ar}} $ é a [massa molar do ar seco](#1215-molar_mass_for_dry_air) em $ \frac{\text{kg}}{\text{mol}} $
+$$
+R \text{ é a constante universal dos gases em } \frac{\text{J}}{\text{mol} \cdot \text{K}}
+$$
+
+$$
+M_{\text{ar}} \text{ é a massa molar do ar seco em } \frac{\text{kg}}{\text{mol}}
+$$
 
 A temperatura é estimada utilizando a equação:
 
@@ -370,9 +416,17 @@ $$
 
 Onde:
 
-- $ T_{0} $ é a [temperatura ao nível do mar](#1211-sea_level_temperature) em $ \text{K} $
-- $ L $ é a [taxa de variação da temperatura com a altitude](#1213-temperature_lapse_rate) em $ \frac{\text{K}}{\text{m}} $
-- $ h $ é a altitude em $ \text{m} $
+$$
+T_{0} \text{ é a temperatura ao nível do mar em } \text{K}
+$$
+
+$$
+L \text{ é a taxa de variação da temperatura com a altitude em } \frac{\text{K}}{\text{m}}
+$$
+
+$$
+h \text{ é a altitude em } \text{m}
+$$
 
 A pressão atmosférica local é estimada utilizando a equação barométrica para altitudes até 11 km:
 
@@ -382,8 +436,13 @@ $$
 
 Onde:
 
-- $ P_{0} $ é a [pressão ao nível do mar](#1212-sea_level_pressure) em $ \text{Pa} $
-- $ g $ é a [aceleração gravitacional](#1216-gravitational_acceleration) em $ \frac{\text{m}}{\text{s}^{2}} $
+$$
+P_{0} \text{ é a pressão ao nível do mar em } \text{Pa}
+$$
+
+$$
+g \text{ é a aceleração gravitacional em } \frac{\text{m}}{\text{s}^{2}}
+$$
 
 #### 1.2.2.2. `air_viscosity`
 
@@ -397,11 +456,25 @@ $$
 
 Onde:
 
-- $ \mu $ é a viscosidade dinâmica do ar em $ \text{Pa} \cdot \text{s} $
-- $ \mu_{0} $ é a [viscosidade dinâmica do ar ao nível do mar](#1217-sea_level_air_dynamic_viscosity) em $ \text{Pa} \cdot \text{s} $
-- $ T $ é a temperatura em $ \text{K} $
-- $ T_{0} $ é a [temperatura ao nível do mar](#1211-sea_level_temperature) em $ \text{K} $
-- $ S $ é a [constante de Sutherland](#1218-sutherland_constant) em $ \text{K} $
+$$
+\mu \text{ é a viscosidade dinâmica do ar em } \text{Pa} \cdot \text{s}
+$$
+
+$$
+\mu_{0} \text{ é a viscosidade dinâmica do ar ao nível do mar em } \text{Pa} \cdot \text{s}
+$$
+
+$$
+T \text{ é a temperatura em } \text{K}
+$$
+
+$$
+T_{0} \text{ é a temperatura ao nível do mar em } \text{K}
+$$
+
+$$
+S \text{ é a constante de Sutherland em } \text{K}
+$$
 
 #### 1.2.2.3. `reynolds_number`
 
@@ -415,11 +488,25 @@ $$
 
 Onde:
 
-- $ \text{Re} $ é o número de Reynolds
-- $ \rho $ é a densidade do ar em $ \frac{\text{kg}}{\text{m}^{3}} $
-- $ V $ é a velocidade em $ \frac{\text{m}}{\text{s}} $
-- $ l $ é o comprimento de referência em $ \text{m} $
-- $ \mu $ é a viscosidade dinâmica do ar em $ \text{Pa} \cdot \text{s} $
+$$
+\text{Re} \text{ é o número de Reynolds}
+$$
+
+$$
+\rho \text{ é a densidade do ar em } \frac{\text{kg}}{\text{m}^{3}}
+$$
+
+$$
+V \text{ é a velocidade em } \frac{\text{m}}{\text{s}}
+$$
+
+$$
+l \text{ é o comprimento de referência em } \text{m}
+$$
+
+$$
+\mu \text{ é a viscosidade dinâmica do ar em } \text{Pa} \cdot \text{s}
+$$
 
 ### 1.2.3. `models`
 
