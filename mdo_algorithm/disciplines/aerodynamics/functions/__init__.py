@@ -3,7 +3,7 @@ Aerodynamics functions module
 """
 
 from .main import (
-    cl_alpha_slope,
+    lift_coefficient_slope,
     plot_coefficients,
     plot_drag_polar,
     plot_lift_distribution,
