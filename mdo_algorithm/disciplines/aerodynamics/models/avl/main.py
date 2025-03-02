@@ -13,10 +13,10 @@ from pandera.typing import DataFrame
 import numpy as np
 
 from mdo_algorithm.disciplines.common.models.geometries import (
-    Xyz,
+    Point,
     MassProperties,
 )
-from mdo_algorithm.disciplines.aerodynamics.functions import cl_alpha_slope
+from mdo_algorithm.disciplines.aerodynamics.functions import lift_coefficient_slope
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     Airfoil,
     Wing,
@@ -88,7 +88,7 @@ class Header:
 
     :param default_location: Default moment reference point (corresponds to Xref, Yref,
     Zref in AVL).
-    :type default_location: Xyz
+    :type default_location: Point
 
     :param default_profile_drag_coefficient: Default profile drag coefficient
     (corresponds to CDp in AVL).
@@ -103,12 +103,24 @@ class Header:
     reference_area: float
     reference_chord: float
     reference_span: float
-    default_location: Xyz
+    default_location: Point
     default_profile_drag_coefficient: float | None
 
-    def to_input_file(self) -> str:
+    @overload
+    def to_avl(self) -> str: ...
+
+    @overload
+    def to_avl(self, file: None) -> str: ...
+
+    @overload
+    def to_avl(self, file: IO[str]) -> None: ...
+
+    def to_avl(self, file: IO[str] | None = None) -> str | None:
         """
-        Export formatted string for the AVL input file
+        Export formatted AVL file
+
+        :param file: File to write the AVL input to.
+        :type file: IO[str] | None
         """
         line_array: list[str] = [
             "# case title",
@@ -148,7 +160,11 @@ class Header:
             line_array.extend(["", "# CDp", str(float(self.default_profile_drag_coefficient)), ""])
         if line_array[-1] != "":
             line_array.append("")
-        return "\n".join(line_array)
+        output = "\n".join(line_array)
+        if file is not None:
+            file.write(output)
+            return None
+        return output
 
 
 @dataclass
@@ -227,7 +243,7 @@ class Control:
 
     :param hinge_axis_location: Axis of rotation for the control surface (corresponds
     to XYZhvec in AVL).
-    :type hinge_axis_location: Xyz
+    :type hinge_axis_location: Point
 
     :param deflection: Direction of control deflection (corresponds to SgnDup in AVL).
     :type deflection: Deflection
@@ -236,12 +252,24 @@ class Control:
     name: str
     gain: float
     hinge_x_location: float
-    hinge_axis_location: Xyz
+    hinge_axis_location: Point
     deflection: Deflection
 
-    def to_input_file(self) -> str:
+    @overload
+    def to_avl(self) -> str: ...
+
+    @overload
+    def to_avl(self, file: None) -> str: ...
+
+    @overload
+    def to_avl(self, file: IO[str]) -> None: ...
+
+    def to_avl(self, file: IO[str] | None = None) -> str | None:
         """
-        Export formatted string for the AVL input file
+        Export formatted AVL file
+
+        :param file: File to write the AVL input to.
+        :type file: IO[str] | None
         """
         line_array: list[str] = [
             "CONTROL",
@@ -260,7 +288,11 @@ class Control:
             ),
             "",
         ]
-        return "\n".join(line_array)
+        output = "\n".join(line_array)
+        if file is not None:
+            file.write(output)
+            return None
+        return output
 
 
 @dataclass
@@ -270,7 +302,7 @@ class Section:
 
     :param location: Position of the leading edge (corresponds to Xle, Yle
     and Zle in AVL).
-    :type location: Xyz
+    :type location: Point
 
     :param chord: Section chord length (corresponds to Chord in AVL).
     :type chord: float
@@ -292,28 +324,40 @@ class Section:
     :param control_array: List of associated control surfaces.
     :type control_array: list["Control"]
 
-    :param cl_alpha_slope_scaling: Scaling factor for lift slope (corresponds to the
+    :param lift_coefficient_slope_scaling: Scaling factor for lift slope (corresponds to the
     CLAF keyword in AVL as dCL/da scaling factor).
-    :type cl_alpha_slope_scaling: float | None
+    :type lift_coefficient_slope_scaling: float | None
 
     :param profile_drag_settings: Drag settings for this section (corresponds to the
     CDCL keyword in AVL as CL1, CD1, CL2, CD2, CL3, CD3).
     :type profile_drag_settings: ProfileDragSettings | None
     """
 
-    location: Xyz
+    location: Point
     chord: float
     incremental_angle: float
     spanwise_vortice_count: int | None
     spanwise_vortex_spacing: float | None
     airfoil: Airfoil
     control_array: list[Control]
-    cl_alpha_slope_scaling: float | None
+    lift_coefficient_slope_scaling: float | None
     profile_drag_settings: ProfileDragSettings | None
 
-    def to_input_file(self) -> str:
+    @overload
+    def to_avl(self) -> str: ...
+
+    @overload
+    def to_avl(self, file: None) -> str: ...
+
+    @overload
+    def to_avl(self, file: IO[str]) -> None: ...
+
+    def to_avl(self, file: IO[str] | None = None) -> str | None:
         """
-        Export formatted string for the AVL input file
+        Export formatted AVL file
+
+        :param file: File to write the AVL input to.
+        :type file: IO[str] | None
         """
         line_array: list[str] = [
             "SECTION",
@@ -343,13 +387,13 @@ class Section:
             "AFILE",
             self.airfoil.relative_path(),
         ]
-        if self.cl_alpha_slope_scaling is not None:
+        if self.lift_coefficient_slope_scaling is not None:
             line_array.extend(
                 [
                     "",
                     "# dCL/da scaling factor",
                     "CLAF",
-                    str(float(self.cl_alpha_slope_scaling)),
+                    str(float(self.lift_coefficient_slope_scaling)),
                     "",
                 ]
             )
@@ -375,9 +419,13 @@ class Section:
             )
         if line_array[-1] != "":
             line_array.append("")
-        return "\n".join(line_array) + "\n".join(
-            [control.to_input_file() for control in self.control_array]
+        output = "\n".join(line_array) + "\n".join(
+            [control.to_avl() for control in self.control_array]
         )
+        if file is not None:
+            file.write(output)
+            return None
+        return output
 
 
 @dataclass
@@ -404,11 +452,11 @@ class Body:
 
     :param scale: Scaling factors in X, Y, and Z directions (corresponds to the
     SCALE keyword in AVL as Xscale, Yscale and Zscale).
-    :type scale: Xyz | None
+    :type scale: Point | None
 
     :param translate: Translation vector (corresponds to the TRANSLATE keyword in AVL
     as dX, dY and dZ).
-    :type translate: Xyz | None
+    :type translate: Point | None
     """
 
     name: str
@@ -416,12 +464,24 @@ class Body:
     node_spacing: float
     mirror_surface: bool
     xz_plane_location: float | None
-    scale: Xyz | None
-    translate: Xyz | None
+    scale: Point | None
+    translate: Point | None
 
-    def to_input_file(self) -> str:
+    @overload
+    def to_avl(self) -> str: ...
+
+    @overload
+    def to_avl(self, file: None) -> str: ...
+
+    @overload
+    def to_avl(self, file: IO[str]) -> None: ...
+
+    def to_avl(self, file: IO[str] | None = None) -> str | None:
         """
-        Export formatted string for the AVL input file
+        Export formatted AVL file
+
+        :param file: File to write the AVL input to.
+        :type file: IO[str] | None
         """
         line_array: list[str] = [
             "BODY",
@@ -481,7 +541,11 @@ class Body:
             )
         if line_array[-1] != "":
             line_array.append("")
-        return "\n".join(line_array)
+        output = "\n".join(line_array)
+        if file is not None:
+            file.write(output)
+            return None
+        return output
 
 
 @dataclass
@@ -518,11 +582,11 @@ class Surface:
 
     :param scale: Scaling factors in X, Y, and Z directions (corresponds to the SCALE
     keyword in AVL as Xscale, Yscale and Zscale).
-    :type scale: Xyz | None
+    :type scale: Point | None
 
     :param translate: Translation vector (corresponds to the TRANSLATE keyword in AVL
     as dX, dY and dZ).
-    :type translate: Xyz | None
+    :type translate: Point | None
 
     :param incremental_angle: Additional incidence angle (corresponds to the ANGLE keyword
     in AVL as dAinc).
@@ -555,8 +619,8 @@ class Surface:
     spanwise_vortex_spacing: float | None
     mirror_surface: bool
     xz_plane_location: float | None
-    scale: Xyz | None
-    translate: Xyz | None
+    scale: Point | None
+    translate: Point | None
     incremental_angle: float | None
     ignore_wake: bool
     ignore_freestream_effect: bool
@@ -564,9 +628,21 @@ class Surface:
     profile_drag_settings: ProfileDragSettings | None
     section_array: list[Section]
 
-    def to_input_file(self) -> str:
+    @overload
+    def to_avl(self) -> str: ...
+
+    @overload
+    def to_avl(self, file: None) -> str: ...
+
+    @overload
+    def to_avl(self, file: IO[str]) -> None: ...
+
+    def to_avl(self, file: IO[str] | None = None) -> str | None:
         """
-        Export formatted string for the AVL input file
+        Export formatted AVL file
+
+        :param file: File to write the AVL input to.
+        :type file: IO[str] | None
         """
         line_array: list[str] = [
             "SURFACE",
@@ -679,12 +755,16 @@ class Surface:
             )
         if line_array[-1] != "":
             line_array.append("")
-        return "\n".join(
+        output = "\n".join(
             [
                 "\n".join(line_array),
-                "\n".join([section.to_input_file() for section in self.section_array]),
+                "\n".join([section.to_avl() for section in self.section_array]),
             ]
         )
+        if file is not None:
+            file.write(output)
+            return None
+        return output
 
 
 @dataclass
@@ -739,7 +819,7 @@ class GeometryInput:
                 reference_area=round(wing.planform_area(), 3),
                 reference_chord=round(wing.mean_aerodynamic_chord(), 3),
                 reference_span=wing.span(),
-                default_location=Xyz(0.25 * wing.section_array[0].chord, 0, 0),
+                default_location=Point(0.25 * wing.section_array[0].chord, 0, 0),
                 default_profile_drag_coefficient=None,
             ),
             surface_array=[
@@ -767,8 +847,12 @@ class GeometryInput:
                             spanwise_vortex_spacing=None,
                             airfoil=wing_section.airfoil,
                             control_array=[],
-                            cl_alpha_slope_scaling=(
-                                round(cl_alpha_slope(xfoil_coefficients_array[i]) / (2 * np.pi), 3)
+                            lift_coefficient_slope_scaling=(
+                                round(
+                                    lift_coefficient_slope(xfoil_coefficients_array[i])
+                                    / (2 * np.pi),
+                                    3,
+                                )
                                 if xfoil_coefficients_array is not None
                                 else None
                             ),
@@ -805,9 +889,9 @@ class GeometryInput:
         """
         avl = "\n".join(
             [
-                self.header.to_input_file(),
-                "\n".join([surface.to_input_file() for surface in self.surface_array]),
-                "\n".join([body.to_input_file() for body in self.body_array]),
+                self.header.to_avl(),
+                "\n".join([surface.to_avl() for surface in self.surface_array]),
+                "\n".join([body.to_avl() for body in self.body_array]),
             ]
         )
         if file is not None:
