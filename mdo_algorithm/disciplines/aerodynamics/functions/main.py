@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 from scipy.stats import linregress
+from scipy.optimize import curve_fit
 
 from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
     Coefficients,
@@ -29,6 +30,41 @@ def lift_coefficient_slope(coefficients: DataFrame[Coefficients]) -> float:
     alpha = coefficients.loc[mask, "alpha"] * np.pi / 180
     cl = coefficients.loc[mask, "lift_coefficient"]
     return linregress(alpha, cl).slope
+
+
+def lift_coefficient_quadratic_model(
+    coefficients: DataFrame[Coefficients],
+) -> tuple[float, float, float, float]:
+    """
+    Fit a quadratic model to the lift coefficient.
+
+    :param coefficients: Aerodynamic coefficients
+    :type coefficients: DataFrame[Coefficients]
+
+    :return:
+        Quadratic model coefficients
+
+        - cd0: Zero lift drag coefficient
+        - cl_cd0: Lift coefficient at zero drag
+        - cd2u: Quadratic drag coefficient for upper part of the drag polar
+        - cd2l: Quadratic drag coefficient for lower part of the drag polar
+
+    :rtype: tuple[float, float, float, float]
+    """
+    df = coefficients.sort_values(by="lift_coefficient")
+    cl = df["lift_coefficient"].values
+    cd = df["drag_coefficient"].values
+    cl_cd0 = cl[np.argmin(cd)]  # type: ignore
+    cd0 = min(cd)
+    mask_upper = cl >= cl_cd0
+    mask_lower = cl < cl_cd0
+    cd2u = curve_fit(
+        lambda cl, cd2: cd0 + cd2 * (cl - cl_cd0) ** 2, cl[mask_upper], cd[mask_upper]
+    )[0][0]
+    cd2l = curve_fit(
+        lambda cl, cd2: cd0 + cd2 * (cl - cl_cd0) ** 2, cl[mask_lower], cd[mask_lower]
+    )[0][0]
+    return cd0, float(cl_cd0), cd2u, cd2l
 
 
 def plot_coefficients(coefficients_array: list[DataFrame[Coefficients]]) -> None:
