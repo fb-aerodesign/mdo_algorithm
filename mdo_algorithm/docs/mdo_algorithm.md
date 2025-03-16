@@ -601,3 +601,7 @@ Software de análise aerodinâmica [AVL](https://web.mit.edu/drela/Public/web/av
 ## 2.2. `xfoil`
 
 Software de análise de perfis aerodinâmicos [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/).
+
+## 2.3. `qprop`
+
+Software de análise de hélices [QPROP](https://web.mit.edu/drela/Public/web/qprop/).
