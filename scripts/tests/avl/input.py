@@ -22,7 +22,7 @@ from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     SurfaceSection,
     Wing,
 )
-from mdo_algorithm.disciplines.aerodynamics.models.dataframe import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.data_frame import Coefficients
 from mdo_algorithm.disciplines.aerodynamics.models.avl import (
     GeometryInput,
     MassInput,

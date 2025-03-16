@@ -21,7 +21,7 @@ from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     Airfoil,
     Wing,
 )
-from mdo_algorithm.disciplines.aerodynamics.models.dataframe import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.data_frame import Coefficients
 
 
 class Symmetry(IntEnum):

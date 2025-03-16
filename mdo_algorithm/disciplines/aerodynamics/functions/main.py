@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import linregress
 
-from mdo_algorithm.disciplines.aerodynamics.models.dataframe import (
+from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
     Coefficients,
     LiftCoefficientDistribution,
 )

@@ -13,7 +13,7 @@ from pandera.typing import DataFrame
 
 from mdo_algorithm.disciplines.aerodynamics.constants import AVL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Wing
-from mdo_algorithm.disciplines.aerodynamics.models.dataframe import (
+from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
     Coefficients,
     LiftCoefficientDistribution,
 )

@@ -9,7 +9,7 @@ from mdo_algorithm.disciplines.common.functions import (
 )
 
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-from mdo_algorithm.disciplines.aerodynamics.models.dataframe import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.data_frame import Coefficients
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService
 from mdo_algorithm.disciplines.aerodynamics.functions import plot_coefficients
 
