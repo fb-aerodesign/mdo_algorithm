@@ -1,6 +1,6 @@
 # Módulo `mdo_algorithm`
 
-# Íncide
+# Índice
 
 - [`disciplines`](#1-disciplines)
    - [`aerodynamics`](#11-aerodynamics)
