@@ -605,4 +605,4 @@ Software de análise de perfis aerodinâmicos [XFOIL](https://web.mit.edu/drela/
 
 ## 2.3. `qprop`
 
-Software de análise de hélices [QPROP](https://web.mit.edu/drela/Public/web/qprop/).
+Software de análise de desempenho de conjuntos de hélices e motores [QPROP](https://web.mit.edu/drela/Public/web/qprop/).
