@@ -2,4 +2,7 @@
 Performance models module
 """
 
-from . import qprop
+from . import (
+    data_frame,
+    qprop,
+)
