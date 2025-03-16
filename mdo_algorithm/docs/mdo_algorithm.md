@@ -57,6 +57,7 @@
 - [`softwares`](#2-softwares)
    - [`avl`](#21-avl)
    - [`xfoil`](#22-xfoil)
+   - [`qprop`](#23-qprop)
 
 # 1. `disciplines`
 
