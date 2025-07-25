@@ -2,7 +2,7 @@
 Aerodynamics geometry models
 
 This module defines classes for representing airfoils, wing sections, and complete wings.
-It includes geometric calculations essential for aircraft design, such as span, 
+It includes geometric calculations essential for aircraft design, such as span,
 planform area, and mean aerodynamic chord.
 """
 
@@ -118,3 +118,12 @@ class Wing:
                 2 / area * quad(lambda x: self.chord_distribution(x) ** 2, 0, self.span() / 2)[0]
             )
         return result
+
+    def aspect_ratio(self) -> float:
+        """
+        Calculate the aspect ratio of the wing.
+
+        :return: Aspect ratio (span^2 / planform area).
+        :rtype: float
+        """
+        return self.span() ** 2 / self.planform_area() if self.planform_area() != 0 else 0

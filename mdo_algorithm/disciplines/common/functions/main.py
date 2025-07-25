@@ -58,7 +58,7 @@ def air_viscosity(temperature: float) -> float:
     mu0 = SEA_LEVEL_AIR_DYNAMIC_VISCOSITY
     s = SUTHERLAND_CONSTANT
 
-    mu = mu0 * (t / t0)**1.5 * (t0 + s) / (t + s)
+    mu = mu0 * (t / t0) ** 1.5 * (t0 + s) / (t + s)
     return mu
 
 

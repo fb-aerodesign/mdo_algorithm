@@ -139,6 +139,10 @@ class AvlService:
                 f"B={round(wing.span(), 3)}m",
             ]
         )
+        df.attrs["name"] = (
+            f"avl_3d_{wing.section_array[0].airfoil.name}_s{round(wing.planform_area(), 3)}"
+            f"_cmac{round(wing.mean_aerodynamic_chord(), 3)}_b{round(wing.span(), 3)}"
+        ).replace("+", "")
         return df
 
     def get_wing_lift_coefficient_distribution(

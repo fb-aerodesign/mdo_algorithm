@@ -2,7 +2,11 @@
 Get the lift coefficient distribution
 """
 
+import os
+
 from pandera.typing import DataFrame
+
+from utils import config  # pylint: disable=unused-import
 
 from mdo_algorithm.disciplines.common.constants import GRAVITATIONAL_ACCELERATION
 from mdo_algorithm.disciplines.common.functions import (
@@ -19,7 +23,10 @@ from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
     SurfaceSection,
     Wing,
 )
-from mdo_algorithm.disciplines.aerodynamics.models.data_frame import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
+    Coefficients,
+    LiftCoefficientDistribution,
+)
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService
 from mdo_algorithm.disciplines.aerodynamics.services.avl import AvlService
 from mdo_algorithm.disciplines.aerodynamics.functions import plot_lift_distribution
@@ -35,7 +42,7 @@ def main():
                 location=Point(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
             ),
             SurfaceSection(
-                location=Point(0.15, 1.15, 0),
+                location=Point(0.15, 1.3, 0),
                 chord=0.3,
                 incremental_angle=0,
                 airfoil=Airfoil("s1223"),
@@ -52,7 +59,7 @@ def main():
             section.airfoil,
             **{
                 "alpha": alpha,
-                "reynolds": reynolds_number(15, section.chord, 660, 20),
+                "reynolds": reynolds_number(18, section.chord, 660, 20),
                 "iterations": 1000,
             },
         )
@@ -65,7 +72,7 @@ def main():
     }
 
     avl_service = AvlService()
-    lift_distribution_array = []
+    lift_distribution_array: list[DataFrame[LiftCoefficientDistribution]] = []
     lift_distribution_array.append(
         avl_service.get_wing_lift_coefficient_distribution(
             wing,
@@ -86,6 +93,12 @@ def main():
             wing, coefficients_array, alpha=4, bank_angle=30, **parameters
         )
     )
+    results_folder = os.path.join(os.path.dirname(__file__), "lift_coefficient_distribution")
+    if not os.path.exists(results_folder):
+        os.makedirs(results_folder)
+    lift_distribution_array[0].to_csv(os.path.join(results_folder, "nivelado.csv"))
+    lift_distribution_array[1].to_csv(os.path.join(results_folder, "arfagem.csv"))
+    lift_distribution_array[2].to_csv(os.path.join(results_folder, "curva.csv"))
     plot_lift_distribution(lift_distribution_array, ["Nivelado", "Arfagem", "Curva"])
 
 

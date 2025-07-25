@@ -108,5 +108,10 @@ class XfoilService:
                 f"Re={reynolds:.3e}" if reynolds is not None else "Inviscid",
             ]
         )
+        df.attrs["name"] = (
+            f"xfoil_2d_{airfoil.name}_re{reynolds:.3e}"
+            if reynolds is not None
+            else f"xfoil_2d_{airfoil.name}_inviscid"
+        ).replace("+", "")
         os.remove(result_file_path)
         return df

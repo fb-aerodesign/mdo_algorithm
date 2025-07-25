@@ -78,12 +78,13 @@ def plot_coefficients(coefficients_array: list[DataFrame[Coefficients]]) -> None
     fig.suptitle("Coefficients")
     legend = False
     for coefficients in coefficients_array:
-        (line,) = ax1.plot(coefficients["alpha"], coefficients["lift_coefficient"])
-        ax2.plot(coefficients["alpha"], coefficients["drag_coefficient"])
-        ax3.plot(coefficients["alpha"], coefficients["moment_coefficient"])
+        (line,) = ax1.plot(coefficients["alpha"], coefficients["lift_coefficient"], marker="o")
+        ax2.plot(coefficients["alpha"], coefficients["drag_coefficient"], marker="o")
+        ax3.plot(coefficients["alpha"], coefficients["moment_coefficient"], marker="o")
         ax4.plot(
             coefficients["alpha"],
             coefficients["lift_coefficient"] / coefficients["drag_coefficient"],
+            marker="o",
         )
         if "legend" in coefficients.attrs:
             line.set_label(coefficients.attrs["legend"])
@@ -134,7 +135,7 @@ def plot_lift_distribution(
     :type lift_distribution: DataFrame[LiftCoefficientDistribution]
     """
     fig, ax = plt.subplots()
-    fig.suptitle("Drag Polar")
+    fig.suptitle("Lift distribution")
     legend = False
     for lift_distribution in lift_distribution_array:
         (line,) = ax.plot(
