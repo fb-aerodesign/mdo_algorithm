@@ -7,5 +7,5 @@ from .main import (
     lift_coefficient_quadratic_model,
     plot_coefficients,
     plot_drag_polar,
-    plot_lift_distribution,
+    plot_coefficient_distribution,
 )

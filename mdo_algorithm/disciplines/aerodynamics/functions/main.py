@@ -11,7 +11,7 @@ from scipy.optimize import curve_fit
 
 from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
     Coefficients,
-    LiftCoefficientDistribution,
+    CoefficientDistribution,
 )
 
 
@@ -124,31 +124,31 @@ def plot_drag_polar(coefficients_array: list[DataFrame[Coefficients]]) -> None:
     plt.show()
 
 
-def plot_lift_distribution(
-    lift_distribution_array: list[DataFrame[LiftCoefficientDistribution]],
+def plot_coefficient_distribution(
+    coefficient_distribution_array: list[DataFrame[CoefficientDistribution]],
     label_array: list[str] | None = None,
 ) -> None:
     """
-    Plot the lift coefficient distribution.
+    Plot the coefficient distribution.
 
-    :param lift_distribution: DataFrame containing the lift coefficient distribution.
-    :type lift_distribution: DataFrame[LiftCoefficientDistribution]
+    :param coefficient_distribution: DataFrame containing the coefficient distribution.
+    :type coefficient_distribution: DataFrame[CoefficientDistribution]
     """
     fig, ax = plt.subplots()
-    fig.suptitle("Lift distribution")
+    fig.suptitle("Coefficient distribution")
     legend = False
-    for lift_distribution in lift_distribution_array:
+    for coefficient_distribution in coefficient_distribution_array:
         (line,) = ax.plot(
-            lift_distribution["spanwise_location"], lift_distribution["lift_coefficient"]
+            coefficient_distribution["spanwise_location"], coefficient_distribution["lift_coefficient"]
         )
         label = None
         if label_array:
             label = label_array.pop(0)
-        if "legend" in lift_distribution.attrs:
+        if "legend" in coefficient_distribution.attrs:
             if label is not None:
-                label += " | " + lift_distribution.attrs["legend"]
+                label += " | " + coefficient_distribution.attrs["legend"]
             else:
-                label = lift_distribution.attrs["legend"]
+                label = coefficient_distribution.attrs["legend"]
         if label is not None:
             line.set_label(label)
             legend = True

@@ -1,5 +1,5 @@
 """
-Get the lift coefficient distribution
+Get the coefficient distribution
 """
 
 import os
@@ -25,11 +25,11 @@ from mdo_algorithm.disciplines.aerodynamics.models.geometries import (
 )
 from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
     Coefficients,
-    LiftCoefficientDistribution,
+    CoefficientDistribution,
 )
 from mdo_algorithm.disciplines.aerodynamics.services.xfoil import XfoilService
 from mdo_algorithm.disciplines.aerodynamics.services.avl import AvlService
-from mdo_algorithm.disciplines.aerodynamics.functions import plot_lift_distribution
+from mdo_algorithm.disciplines.aerodynamics.functions import plot_coefficient_distribution
 
 
 def main():
@@ -72,34 +72,34 @@ def main():
     }
 
     avl_service = AvlService()
-    lift_distribution_array: list[DataFrame[LiftCoefficientDistribution]] = []
-    lift_distribution_array.append(
-        avl_service.get_wing_lift_coefficient_distribution(
+    distribution_array: list[DataFrame[CoefficientDistribution]] = []
+    distribution_array.append(
+        avl_service.get_wing_coefficient_distribution(
             wing,
             coefficients_array,
             **parameters,
         )
     )
-    lift_distribution_array.append(
-        avl_service.get_wing_lift_coefficient_distribution(
+    distribution_array.append(
+        avl_service.get_wing_coefficient_distribution(
             wing,
             coefficients_array,
             alpha=10,
             **parameters,
         )
     )
-    lift_distribution_array.append(
-        avl_service.get_wing_lift_coefficient_distribution(
+    distribution_array.append(
+        avl_service.get_wing_coefficient_distribution(
             wing, coefficients_array, alpha=4, bank_angle=30, **parameters
         )
     )
-    results_folder = os.path.join(os.path.dirname(__file__), "lift_coefficient_distribution")
+    results_folder = os.path.join(os.path.dirname(__file__), "coefficient_distribution")
     if not os.path.exists(results_folder):
         os.makedirs(results_folder)
-    lift_distribution_array[0].to_csv(os.path.join(results_folder, "nivelado.csv"))
-    lift_distribution_array[1].to_csv(os.path.join(results_folder, "arfagem.csv"))
-    lift_distribution_array[2].to_csv(os.path.join(results_folder, "curva.csv"))
-    plot_lift_distribution(lift_distribution_array, ["Nivelado", "Arfagem", "Curva"])
+    distribution_array[0].to_csv(os.path.join(results_folder, "nivelado.csv"))
+    distribution_array[1].to_csv(os.path.join(results_folder, "arfagem.csv"))
+    distribution_array[2].to_csv(os.path.join(results_folder, "curva.csv"))
+    plot_coefficient_distribution(distribution_array, ["Nivelado", "Arfagem", "Curva"])
 
 
 if __name__ == "__main__":

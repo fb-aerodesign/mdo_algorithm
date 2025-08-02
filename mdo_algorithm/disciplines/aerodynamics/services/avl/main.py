@@ -15,7 +15,7 @@ from mdo_algorithm.disciplines.aerodynamics.constants import AVL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Wing
 from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
     Coefficients,
-    LiftCoefficientDistribution,
+    CoefficientDistribution,
 )
 from mdo_algorithm.disciplines.aerodynamics.models.avl import (
     GeometryInput,
@@ -145,7 +145,7 @@ class AvlService:
         ).replace("+", "")
         return df
 
-    def get_wing_lift_coefficient_distribution(
+    def get_wing_coefficient_distribution(
         self,
         wing: Wing,
         xfoil_coefficients_array: list[DataFrame[Coefficients]],
@@ -156,9 +156,9 @@ class AvlService:
         time_unit_seconds: float = 1,
         gravitational_acceleration: float | None = None,
         air_density: float | None = None,
-    ) -> DataFrame[LiftCoefficientDistribution]:
+    ) -> DataFrame[CoefficientDistribution]:
         """
-        Get the wing lift coefficient distribution using AVL.
+        Get the wing coefficient distribution using AVL.
         """
         geometry_input = GeometryInput.from_wing(wing, xfoil_coefficients_array)
         with open(
@@ -204,11 +204,14 @@ class AvlService:
         second_table_end = second_table_start + content[second_table_start:].find("\n --")
         df1 = pd.read_fwf(io.StringIO(content[first_table_start:first_table_end])).astype(float)
         df2 = pd.read_fwf(io.StringIO(content[second_table_start:second_table_end])).astype(float)
-        df = DataFrame[LiftCoefficientDistribution](
+        df = DataFrame[CoefficientDistribution](
             pd.DataFrame(
                 {
                     "spanwise_location": pd.concat([df1["Yle"], df2["Yle"]], ignore_index=True),
                     "lift_coefficient": pd.concat([df1["cl"], df2["cl"]], ignore_index=True),
+                    "moment_coefficient": pd.concat(
+                        [df1["cm_c/4"], df2["cm_c/4"]], ignore_index=True
+                    ),
                 }
             ).sort_values("spanwise_location")
         )

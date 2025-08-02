@@ -18,11 +18,12 @@ class Coefficients(pa.DataFrameModel):
     moment_coefficient: Series[float]
 
 
-class LiftCoefficientDistribution(pa.DataFrameModel):
+class CoefficientDistribution(pa.DataFrameModel):
     """
-    DataFrame model for lift coefficient distribution.
+    DataFrame model for coefficient distribution.
     """
 
     idx: Index[int]
     spanwise_location: Series[float]
     lift_coefficient: Series[float]
+    moment_coefficient: Series[float]
