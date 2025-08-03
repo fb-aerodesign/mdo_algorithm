@@ -63,7 +63,7 @@ def main():
     avl_service = AvlService()
     coefficients_array.append(
         avl_service.get_wing_coefficients(
-            wing=wing, xfoil_coefficients_array=coefficients_array, alpha=alpha
+            wing=wing, xfoil_coefficients_array=coefficients_array, alpha=(-20, 15, 0.1)
         )
     )
     print(lift_coefficient_slope(coefficients_array[-1]))

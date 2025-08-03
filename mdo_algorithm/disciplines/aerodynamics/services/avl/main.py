@@ -102,7 +102,7 @@ class AvlService:
         commands = ["OPER"]
         append = False
         if isinstance(alpha, tuple):
-            alpha = [float(v) for v in np.arange(alpha[0], alpha[1] + 1, alpha[2])]
+            alpha = [float(v) for v in np.arange(alpha[0], alpha[1] + 1, alpha[2] / 2)]
         for v in alpha:
             commands.extend([f"A A {v}", "X", f"FT {self.__result_file_path}"])
             if append:
