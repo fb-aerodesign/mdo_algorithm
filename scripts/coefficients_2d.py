@@ -6,9 +6,9 @@ from pandera.typing import DataFrame
 
 from utils import config  # pylint: disable=unused-import
 
-from mdo_algorithm.disciplines.common.functions import (
-    reynolds_number,
-)
+# from mdo_algorithm.disciplines.common.functions import (
+#     reynolds_number,
+# )
 
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
 from mdo_algorithm.disciplines.aerodynamics.models.data_frame import Coefficients
@@ -22,7 +22,7 @@ def main():
     """
     analysis_parameters = {
         "alpha": (-5, 20, 0.5),
-        "reynolds": reynolds_number(18, 0.467, 700, 25),
+        "reynolds": 7e5,
         "iterations": 1000,
     }
 
