@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name, line-too-long
+
 """
 Get wing area
 """
@@ -86,7 +88,7 @@ def _build_section_array(cfg: dict, airfoil: Airfoil) -> list[SurfaceSection]:
 
 def main():
     """
-    Get wing area
+    Get wing data
     """
 
     wing_configs = [
@@ -102,10 +104,19 @@ def main():
         {
             "nome": "2026 retangular 1",
             "forma": "retangular",
-            "b": 1.5,
-            "chord_root": 0.6,
-            "chord_tip": 0.6,
+            "b": 2,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
             "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 1",
+            "forma": "trapezoidal",
+            "b": 2,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
             "peso_vazio": 3,
         },
         {
@@ -113,10 +124,242 @@ def main():
             "forma": "misto",
             "b": 2,
             "b_rect": 0.5,
-            "chord_root": 0.6,
-            "chord_tip": 0.25,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
             "sweep_x_rect": 0,
-            "sweep_x_trap": 0.12,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 2",
+            "forma": "retangular",
+            "b": 1.9,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 2",
+            "forma": "trapezoidal",
+            "b": 1.9,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 2",
+            "forma": "misto",
+            "b": 1.9,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 3",
+            "forma": "retangular",
+            "b": 1.8,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 3",
+            "forma": "trapezoidal",
+            "b": 1.8,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 3",
+            "forma": "misto",
+            "b": 1.8,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 4",
+            "forma": "retangular",
+            "b": 1.7,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 4",
+            "forma": "trapezoidal",
+            "b": 1.7,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 4",
+            "forma": "misto",
+            "b": 1.7,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 5",
+            "forma": "retangular",
+            "b": 1.6,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 5",
+            "forma": "trapezoidal",
+            "b": 1.6,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 5",
+            "forma": "misto",
+            "b": 1.6,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 6",
+            "forma": "retangular",
+            "b": 1.5,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 6",
+            "forma": "trapezoidal",
+            "b": 1.5,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 6",
+            "forma": "misto",
+            "b": 1.5,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 7",
+            "forma": "retangular",
+            "b": 1.4,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 7",
+            "forma": "trapezoidal",
+            "b": 1.4,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 7",
+            "forma": "misto",
+            "b": 1.4,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 8",
+            "forma": "retangular",
+            "b": 1.3,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 8",
+            "forma": "trapezoidal",
+            "b": 1.3,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 8",
+            "forma": "misto",
+            "b": 1.3,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 retangular 9",
+            "forma": "retangular",
+            "b": 1.25,
+            "chord_root": 0.85,
+            "chord_tip": 0.85,
+            "sweep_x": 0,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 trapezoidal 9",
+            "forma": "trapezoidal",
+            "b": 1.25,
+            "chord_root": 1,
+            "chord_tip": 0.7,
+            "sweep_x": 0.15,
+            "peso_vazio": 3,
+        },
+        {
+            "nome": "2026 misto 9",
+            "forma": "misto",
+            "b": 1.25,
+            "b_rect": 0.5,
+            "chord_root": 0.9,
+            "chord_tip": 0.6,
+            "sweep_x_rect": 0,
+            "sweep_x_trap": 0.15,
             "peso_vazio": 3,
         },
     ]
@@ -134,6 +377,7 @@ def main():
         lift = 0.5 * rho * v**2 * area * cl
         mtow = lift / 10
         carga_paga = mtow - cfg["peso_vazio"]
+        aspect_ratio = wing.aspect_ratio()
         wings_array.append(
             {
                 "nome": cfg["nome"],
@@ -143,6 +387,7 @@ def main():
                 "mtow": mtow,
                 "peso_vazio": cfg["peso_vazio"],
                 "carga_paga": carga_paga,
+                "aspect_ratio": aspect_ratio,
             }
         )
 
@@ -151,6 +396,7 @@ def main():
     table.add_column("Forma", style="cyan")
     table.add_column("Envergadura (m)", justify="right", style="green")
     table.add_column("Área (m²)", justify="right", style="green")
+    table.add_column("Aspect Ratio", justify="right", style="green")
     table.add_column("MTOW (kg)", justify="right", style="yellow")
     table.add_column("Peso Vazio (kg)", justify="right", style="yellow")
     table.add_column("Carga Paga (kg)", justify="right", style="magenta")
@@ -161,6 +407,7 @@ def main():
             w["forma"],
             f"{w['envergadura']:.2f}",
             f"{w['area']:.2f}",
+            f"{w['aspect_ratio']:.2f}",
             f"{w['mtow']:.2f}",
             f"{w['peso_vazio']:.2f}",
             f"{w['carga_paga']:.2f}",
@@ -168,6 +415,37 @@ def main():
 
     console = Console()
     console.print(table)
+
+    # Linhas em formato separado para copiar e colar no Google Sheets
+    cols = [
+        "Configuração",
+        "Forma",
+        "Envergadura (m)",
+        "Área (m²)",
+        "Aspect Ratio",
+        "MTOW (kg)",
+        "Peso Vazio (kg)",
+        "Carga Paga (kg)",
+    ]
+    console.print("\n[dim]Para colar no Google Sheets (copie uma linha abaixo):[/dim]")
+    console.print(";".join(cols))
+    for w in wings_array:
+        fmt = lambda x: f"{x:.2f}".replace(  # pylint: disable=unnecessary-lambda-assignment
+            ".", ","
+        )
+        line = ";".join(
+            [
+                w["nome"],
+                w["forma"].capitalize(),
+                fmt(w["envergadura"]),
+                fmt(w["area"]),
+                fmt(w["aspect_ratio"]),
+                fmt(w["mtow"]),
+                fmt(w["peso_vazio"]),
+                fmt(w["carga_paga"]),
+            ]
+        )
+        console.print(line)
 
 
 if __name__ == "__main__":
