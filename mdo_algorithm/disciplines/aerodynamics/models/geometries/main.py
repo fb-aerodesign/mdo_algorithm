@@ -127,3 +127,36 @@ class Wing:
         :rtype: float
         """
         return self.span() ** 2 / self.planform_area() if self.planform_area() != 0 else 0
+
+    def taper_ratio(self) -> float:
+        """
+        Calculate the taper ratio of the wing.
+
+        :return: Taper ratio (tip chord / root chord).
+        :rtype: float
+        """
+        if not self.section_array:
+            return 0.0
+        root_chord = self.section_array[0].chord
+        tip_chord = self.section_array[-1].chord
+        return tip_chord / root_chord if root_chord != 0 else 0.0
+
+    def sweep_angle(self) -> float:
+        """
+        Calculate the sweep angle of the wing.
+
+        :return: Sweep angle in radians.
+        :rtype: float
+        """
+        if not self.section_array:
+            return 0.0
+        root_section = self.section_array[0]
+        tip_section = self.section_array[-1]
+        return (
+            np.arctan2(
+                tip_section.location.x - root_section.location.x,
+                tip_section.location.y - root_section.location.y,
+            )
+            * 180
+            / np.pi
+        )

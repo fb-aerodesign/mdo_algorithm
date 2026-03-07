@@ -63,17 +63,16 @@ def main():
     avl_service = AvlService()
     coefficients_array.append(
         avl_service.get_wing_coefficients(
-            wing=wing, xfoil_coefficients_array=coefficients_array, alpha=(-20, 15, 0.1)
+            wing=wing, xfoil_coefficients_array=coefficients_array, alpha=(0, 15, 1)
         )
     )
-    print(lift_coefficient_slope(coefficients_array[-1]))
     results_folder = os.path.join(os.path.dirname(__file__), "3d_coefficients")
     if not os.path.exists(results_folder):
         os.makedirs(results_folder)
     for i, coefficients in enumerate(coefficients_array):
         name = coefficients.attrs.get("name", f"coefficients_{i + 1}")
         coefficients.to_csv(os.path.join(results_folder, f"{name}.csv"))
-    plot_coefficients(coefficients_array)
+    plot_coefficients(coefficients_array[-1:])
 
 
 if __name__ == "__main__":

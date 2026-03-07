@@ -78,13 +78,12 @@ def plot_coefficients(coefficients_array: list[DataFrame[Coefficients]]) -> None
     fig.suptitle("Coefficients")
     legend = False
     for coefficients in coefficients_array:
-        (line,) = ax1.plot(coefficients["alpha"], coefficients["lift_coefficient"], marker="o")
-        ax2.plot(coefficients["alpha"], coefficients["drag_coefficient"], marker="o")
-        ax3.plot(coefficients["alpha"], coefficients["moment_coefficient"], marker="o")
+        (line,) = ax1.plot(coefficients["alpha"], coefficients["lift_coefficient"])
+        ax2.plot(coefficients["alpha"], coefficients["drag_coefficient"])
+        ax3.plot(coefficients["alpha"], coefficients["moment_coefficient"])
         ax4.plot(
             coefficients["alpha"],
             coefficients["lift_coefficient"] / coefficients["drag_coefficient"],
-            marker="o",
         )
         if "legend" in coefficients.attrs:
             line.set_label(coefficients.attrs["legend"])
@@ -93,12 +92,16 @@ def plot_coefficients(coefficients_array: list[DataFrame[Coefficients]]) -> None
         fig.legend()
     ax1.set_xlabel("α [°]")
     ax1.set_ylabel("lift coefficient")
+    ax1.grid()
     ax2.set_xlabel("α [°]")
     ax2.set_ylabel("drag coefficient")
+    ax2.grid()
     ax3.set_xlabel("α [°]")
     ax3.set_ylabel("moment coefficient")
+    ax3.grid()
     ax4.set_xlabel("α [°]")
     ax4.set_ylabel("lift coefficient/drag coefficient")
+    ax4.grid()
     plt.show()
 
 
@@ -139,7 +142,8 @@ def plot_coefficient_distribution(
     legend = False
     for coefficient_distribution in coefficient_distribution_array:
         (line,) = ax.plot(
-            coefficient_distribution["spanwise_location"], coefficient_distribution["lift_coefficient"]
+            coefficient_distribution["spanwise_location"],
+            coefficient_distribution["lift_coefficient"],
         )
         label = None
         if label_array:
