@@ -20,11 +20,11 @@ def main():
     wing = Wing(
         section_array=[
             SurfaceSection(
-                location=Point(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
+                location=Point(0, 0, 0), chord=1, incremental_angle=0, airfoil=Airfoil("s1223")
             ),
             SurfaceSection(
-                location=Point(0.15, 1.3, 0),
-                chord=0.3,
+                location=Point(0.15, 0.9, 0),
+                chord=0.7,
                 incremental_angle=0,
                 airfoil=Airfoil("s1223"),
             ),
