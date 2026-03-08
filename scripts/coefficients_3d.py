@@ -32,7 +32,7 @@ def main():
     wing = Wing(
         section_array=[
             SurfaceSection(
-                location=Point(0, 0, 0), chord=1, incremental_angle=0, airfoil=Airfoil("s1223")
+                location=Point(0, 0, 0), chord=0.93, incremental_angle=0, airfoil=Airfoil("s1223")
             ),
             SurfaceSection(
                 location=Point(0.15, 0.9, 0),
@@ -51,7 +51,7 @@ def main():
             section.airfoil,
             **{
                 "alpha": alpha,
-                "reynolds": 1.1e6,
+                "reynolds": 7e5,
                 "iterations": 1000,
             },
         )
