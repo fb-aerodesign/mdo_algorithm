@@ -27,3 +27,13 @@ class CoefficientDistribution(pa.DataFrameModel):
     spanwise_location: Series[float]
     lift_coefficient: Series[float]
     moment_coefficient: Series[float]
+
+
+class ChordwisePressureCoefficient(pa.DataFrameModel):
+    """
+    DataFrame model for chordwise pressure coefficient.
+    """
+    idx: Index[int]
+    x: Series[float]
+    y: Series[float]
+    pressure_coefficient: Series[float]

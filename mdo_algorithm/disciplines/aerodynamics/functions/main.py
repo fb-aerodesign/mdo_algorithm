@@ -12,7 +12,46 @@ from scipy.optimize import curve_fit
 from mdo_algorithm.disciplines.aerodynamics.models.data_frame import (
     Coefficients,
     CoefficientDistribution,
+    ChordwisePressureCoefficient,
 )
+
+
+def _cp_upper_lower_arrays(
+    chordwise_pressure_coefficient: DataFrame[ChordwisePressureCoefficient],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Build common x-grid and Cp arrays for upper and lower surfaces.
+    """
+    leading_edge_idx = int(chordwise_pressure_coefficient["x"].idxmin())
+    upper_surface = chordwise_pressure_coefficient.iloc[: leading_edge_idx + 1].copy()
+    lower_surface = chordwise_pressure_coefficient.iloc[leading_edge_idx:].copy()
+
+    upper_surface = (
+        upper_surface.sort_values("x")
+        .groupby("x", as_index=False)
+        .mean(numeric_only=True)
+    )
+    lower_surface = (
+        lower_surface.sort_values("x")
+        .groupby("x", as_index=False)
+        .mean(numeric_only=True)
+    )
+
+    x_common = np.union1d(
+        upper_surface["x"].to_numpy(),
+        lower_surface["x"].to_numpy(),
+    )
+    cp_upper = np.interp(
+        x_common,
+        upper_surface["x"].to_numpy(),
+        upper_surface["pressure_coefficient"].to_numpy(),
+    )
+    cp_lower = np.interp(
+        x_common,
+        lower_surface["x"].to_numpy(),
+        lower_surface["pressure_coefficient"].to_numpy(),
+    )
+    return x_common, cp_upper, cp_lower
 
 
 def lift_coefficient_slope(coefficients: DataFrame[Coefficients]) -> float:
@@ -30,6 +69,111 @@ def lift_coefficient_slope(coefficients: DataFrame[Coefficients]) -> float:
     alpha = coefficients.loc[mask, "alpha"] * np.pi / 180
     cl = coefficients.loc[mask, "lift_coefficient"]
     return linregress(alpha, cl).slope
+
+
+def center_of_pressure(
+    chordwise_pressure_coefficient: DataFrame[ChordwisePressureCoefficient],
+) -> tuple[float, float, float]:
+    """
+    Calculate center of pressure from chordwise pressure data using integration.
+
+    :param chordwise_pressure_coefficient: Chordwise pressure coefficient distribution.
+    :type chordwise_pressure_coefficient: DataFrame[ChordwisePressureCoefficient]
+
+    :return:
+        Tuple with center of pressure and integrated coefficients:
+        - x_cp_over_c: center of pressure position over chord
+        - normal_force_coefficient: Cn = integral(delta_cp dx)
+        - moment_le_coefficient: Cm_LE = integral(x * delta_cp dx)
+    :rtype: tuple[float, float, float]
+    """
+    x_common, cp_upper, cp_lower = _cp_upper_lower_arrays(chordwise_pressure_coefficient)
+    delta_cp = cp_lower - cp_upper
+    normal_force_integral = np.trapz(delta_cp, x_common)
+    moment_le_integral = np.trapz(x_common * delta_cp, x_common)
+    normal_force_coefficient = float(np.asarray(normal_force_integral).item())
+    moment_le_coefficient = float(np.asarray(moment_le_integral).item())
+    x_cp_over_c = (
+        moment_le_coefficient / normal_force_coefficient
+        if abs(normal_force_coefficient) > 1e-12
+        else float("nan")
+    )
+    return x_cp_over_c, normal_force_coefficient, moment_le_coefficient
+
+
+def chordwise_pressure_difference(
+    chordwise_pressure_coefficient: DataFrame[ChordwisePressureCoefficient],
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate pressure-coefficient difference along chord.
+
+    :param chordwise_pressure_coefficient: Chordwise pressure coefficient distribution.
+    :type chordwise_pressure_coefficient: DataFrame[ChordwisePressureCoefficient]
+
+    :return:
+        Common x-grid and pressure difference:
+        - x_common
+        - delta_cp = Cp_lower - Cp_upper
+    :rtype: tuple[np.ndarray, np.ndarray]
+    """
+    x_common, cp_upper, cp_lower = _cp_upper_lower_arrays(chordwise_pressure_coefficient)
+    return x_common, cp_lower - cp_upper
+
+
+def plot_airfoil_pressure_distribution(
+    chordwise_pressure_coefficient: DataFrame[ChordwisePressureCoefficient],
+    x_cp_over_c: float | None = None,
+) -> None:
+    """
+    Plot airfoil shape and pressure distribution along the chord.
+
+    :param chordwise_pressure_coefficient: Chordwise pressure coefficient distribution.
+    :type chordwise_pressure_coefficient: DataFrame[ChordwisePressureCoefficient]
+
+    :param x_cp_over_c: Optional center of pressure location over chord. If not provided,
+        it is calculated from the pressure distribution.
+    :type x_cp_over_c: float | None
+    """
+    if x_cp_over_c is None:
+        x_cp_over_c, _, _ = center_of_pressure(chordwise_pressure_coefficient)
+
+    x_common, cp_upper, cp_lower = _cp_upper_lower_arrays(chordwise_pressure_coefficient)
+    x_profile = chordwise_pressure_coefficient["x"].to_numpy()
+    y_profile = chordwise_pressure_coefficient["y"].to_numpy()
+
+    fig, (ax_profile, ax_cp) = plt.subplots(
+        2, 1, sharex=True, figsize=(10, 7), gridspec_kw={"height_ratios": [2, 3]}
+    )
+    fig.suptitle("Airfoil profile, Cp distribution and center of pressure")
+
+    ax_profile.plot(x_profile, y_profile, color="black", linewidth=1.2, label="Airfoil")
+    ax_profile.axhline(0, color="gray", linewidth=0.8, linestyle="--")
+    ax_profile.axvline(x_cp_over_c, color="red", linewidth=1.2, linestyle="--")
+    ax_profile.scatter([x_cp_over_c], [0], color="red", s=30, zorder=3, label="Center of pressure")
+    ax_profile.set_ylabel("y/c")
+    ax_profile.set_aspect("equal", adjustable="box")
+    ax_profile.grid(True, alpha=0.3)
+    ax_profile.legend(loc="best")
+
+    ax_cp.plot(x_common, cp_upper, color="tab:blue", linewidth=1.5, label="Cp upper")
+    ax_cp.plot(x_common, cp_lower, color="tab:orange", linewidth=1.5, label="Cp lower")
+    ax_cp.fill_between(
+        x_common,
+        cp_lower,
+        cp_upper,
+        where=(cp_lower >= cp_upper),
+        alpha=0.2,
+        color="tab:green",
+        label="ΔCp",
+    )
+    ax_cp.axvline(x_cp_over_c, color="red", linewidth=1.2, linestyle="--")
+    ax_cp.invert_yaxis()
+    ax_cp.set_xlabel("x/c")
+    ax_cp.set_ylabel("Cp")
+    ax_cp.grid(True, alpha=0.3)
+    ax_cp.legend(loc="best")
+    plt.tight_layout()
+    plt.show()
 
 
 def lift_coefficient_quadratic_model(

@@ -10,7 +10,7 @@ from pandera.typing import DataFrame
 
 from mdo_algorithm.disciplines.aerodynamics.constants import XFOIL_PATH
 from mdo_algorithm.disciplines.aerodynamics.models.geometries import Airfoil
-from mdo_algorithm.disciplines.aerodynamics.models.data_frame import Coefficients
+from mdo_algorithm.disciplines.aerodynamics.models.data_frame import Coefficients, ChordwisePressureCoefficient
 
 
 class XfoilService:
@@ -79,8 +79,10 @@ class XfoilService:
         if isinstance(alpha, list):
             for v in alpha:
                 commands.append(f"ALFA {v}")
+                commands.append(f"CPWR cp_alpha{v}.txt")
         else:
             commands.append(f"ASEQ {alpha[0]} {alpha[1]} {alpha[2]}")
+            commands.append("CPWR cp.txt")
         commands.append("PACC")
         commands.append("")
         commands.append("QUIT")
@@ -114,4 +116,73 @@ class XfoilService:
             else f"xfoil_2d_{airfoil.name}_inviscid"
         ).replace("+", "")
         os.remove(result_file_path)
+        return df
+
+    def get_chordwise_pressure_coefficient(
+        self,
+        airfoil: Airfoil,
+        alpha: float,
+        reynolds: float | None,
+        iterations: int | None,
+    ) -> DataFrame[ChordwisePressureCoefficient]:
+        """
+        Get chordwise pressure coefficient for a given airfoil and angle of attack.
+
+        Reads the file written by XFOIL CPWR: line 1 = airfoil name, line 2 = Alfa/Re,
+        line 3 = header "# x y Cp", then one row per point with x, y, Cp (whitespace-separated).
+
+        :param airfoil: The airfoil to analyze.
+        :type airfoil: Airfoil
+
+        :param alpha: Angle of attack.
+        :type alpha: float
+
+        :param reynolds: Reynolds number.
+        :type reynolds: float | None
+
+        :param iterations: Number of iterations for XFOIL.
+        :type iterations: int | None
+
+        :return: DataFrame containing the chordwise pressure coefficient.
+        :rtype: DataFrame[ChordwisePressureCoefficient]
+        """
+        cp_filename = "cp_result.txt"
+        # XFOIL writes in the process cwd (same as script cwd), not in XFOIL_PATH
+        cp_file_path = os.path.join(os.getcwd(), cp_filename)
+        commands = [f"LOAD {airfoil.relative_path()}"]
+        commands.append("PANE")
+        commands.append("OPER")
+        if reynolds is not None:
+            commands.append(f"VISC {reynolds}")
+            if iterations is not None:
+                commands.append(f"ITER {iterations}")
+        commands.append(f"ALFA {alpha}")
+        commands.append(f"CPWR {cp_filename}")
+        commands.append("QUIT")
+        self.run_xfoil(commands)
+        # XFOIL CPWR: line 1 = airfoil name, line 2 = Alfa/Re, line 3 = "# x y Cp", then data
+        df = DataFrame[ChordwisePressureCoefficient](
+            pd.read_csv(
+                cp_file_path,
+                sep=r"\s+",
+                skiprows=3,
+                names=["x", "y", "pressure_coefficient"],
+                dtype={"x": float, "y": float, "pressure_coefficient": float},
+            )
+        )
+        df.attrs["legend"] = " | ".join(
+            [
+                "XFOIL",
+                "2D Cp",
+                f"Airfoil {airfoil.name}",
+                f"alpha={alpha}",
+                f"Re={reynolds:.3e}" if reynolds is not None else "Inviscid",
+            ]
+        )
+        df.attrs["name"] = (
+            f"xfoil_2d_cp_{airfoil.name}_alfa{alpha}_re{reynolds:.3e}"
+            if reynolds is not None
+            else f"xfoil_2d_cp_{airfoil.name}_alfa{alpha}_inviscid"
+        ).replace("+", "")
+        os.remove(cp_file_path)
         return df
