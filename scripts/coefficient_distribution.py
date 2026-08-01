@@ -39,19 +39,19 @@ def main():
     wing = Wing(
         section_array=[
             SurfaceSection(
-                location=Point(0, 0, 0), chord=0.6, incremental_angle=0, airfoil=Airfoil("s1223")
+                location=Point(0, 0, 0), chord=0.252, incremental_angle=0, airfoil=Airfoil("n0009")
             ),
             SurfaceSection(
-                location=Point(0.15, 1.3, 0),
-                chord=0.3,
+                location=Point(0, 0.383, 0),
+                chord=0.252,
                 incremental_angle=0,
-                airfoil=Airfoil("s1223"),
+                airfoil=Airfoil("n0009"),
             ),
         ],
-        mass_properties=MassProperties(mass=10, center_of_gravity=Point(0.15, 0, 0)),
+        mass_properties=MassProperties(),
     )
 
-    alpha = (-5, 20, 0.5)
+    alpha = (-5, 10, 0.5)
 
     xfoil_service = XfoilService()
     coefficients_array: list[DataFrame[Coefficients]] = [
@@ -77,6 +77,7 @@ def main():
         avl_service.get_wing_coefficient_distribution(
             wing,
             coefficients_array,
+            alpha=-7,
             **parameters,
         )
     )
@@ -84,13 +85,13 @@ def main():
         avl_service.get_wing_coefficient_distribution(
             wing,
             coefficients_array,
-            alpha=10,
+            alpha=3,
             **parameters,
         )
     )
     distribution_array.append(
         avl_service.get_wing_coefficient_distribution(
-            wing, coefficients_array, alpha=4, bank_angle=30, **parameters
+            wing, coefficients_array, alpha=-3, bank_angle=30, **parameters
         )
     )
     results_folder = os.path.join(os.path.dirname(__file__), "coefficient_distribution")
