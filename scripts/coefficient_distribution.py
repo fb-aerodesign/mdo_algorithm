@@ -42,7 +42,7 @@ def main():
                 location=Point(0, 0, 0), chord=0.252, incremental_angle=0, airfoil=Airfoil("n0009")
             ),
             SurfaceSection(
-                location=Point(0, 0.383, 0),
+                location=Point(0, 0.504, 0),
                 chord=0.252,
                 incremental_angle=0,
                 airfoil=Airfoil("n0009"),
